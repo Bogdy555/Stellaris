@@ -1,0 +1,18 @@
+#include "..\Headers\Stellaris_Resources.hpp"
+
+
+
+#include <AuroraCore_WinTargetVer.hpp>
+#include <Windows.h>
+
+
+
+STELLARIS_IDI_MAIN_ICON ICON L".\\Icons\\Stellaris_MainIcon.ico"
+
+
+
+STELLARIS_IDM_MAIN_MANIFEST RT_MANIFEST L".\\Manifests\\Stellaris_MainManifest.manifest"
+
+
+
+#include "Stellaris_EnglishUS.rc2"

@@ -22,7 +22,61 @@
 namespace AuroraCore
 {
 
+	namespace Time
+	{
 
+
+
+	}
+
+	namespace Math
+	{
+
+
+
+	}
+
+	namespace RunTime
+	{
+
+
+
+	}
+
+	namespace Sound
+	{
+
+
+
+	}
+
+	namespace Graphics
+	{
+
+
+
+	}
+
+	namespace Networking
+	{
+
+
+
+	}
+
+	namespace Input
+	{
+
+
+
+	}
+
+	namespace Physics
+	{
+
+
+
+	}
 
 }
 

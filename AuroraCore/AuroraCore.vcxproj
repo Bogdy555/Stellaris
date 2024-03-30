@@ -161,13 +161,29 @@
   <ItemGroup>
     <ClInclude Include="Headers\AuroraCore.hpp" />
     <ClInclude Include="Headers\AuroraCore_Dependencies.hpp" />
+    <ClInclude Include="Headers\AuroraCore_Graphics.hpp" />
+    <ClInclude Include="Headers\AuroraCore_Input.hpp" />
     <ClInclude Include="Headers\AuroraCore_Macros.hpp" />
+    <ClInclude Include="Headers\AuroraCore_Math.hpp" />
+    <ClInclude Include="Headers\AuroraCore_Networking.hpp" />
+    <ClInclude Include="Headers\AuroraCore_Physics.hpp" />
     <ClInclude Include="Headers\AuroraCore_Resources.hpp" />
+    <ClInclude Include="Headers\AuroraCore_RunTime.hpp" />
+    <ClInclude Include="Headers\AuroraCore_Sound.hpp" />
     <ClInclude Include="Headers\AuroraCore_Templates.hpp" />
+    <ClInclude Include="Headers\AuroraCore_Time.hpp" />
     <ClInclude Include="Headers\AuroraCore_Window.hpp" />
     <ClInclude Include="Headers\AuroraCore_WinTargetVer.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Sources\AuroraCore_Graphics.cpp" />
+    <ClCompile Include="Sources\AuroraCore_Input.cpp" />
+    <ClCompile Include="Sources\AuroraCore_Math.cpp" />
+    <ClCompile Include="Sources\AuroraCore_Networking.cpp" />
+    <ClCompile Include="Sources\AuroraCore_Physics.cpp" />
+    <ClCompile Include="Sources\AuroraCore_RunTime.cpp" />
+    <ClCompile Include="Sources\AuroraCore_Sound.cpp" />
+    <ClCompile Include="Sources\AuroraCore_Time.cpp" />
     <ClCompile Include="Sources\AuroraCore_Window.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

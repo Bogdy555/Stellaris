@@ -32,7 +32,19 @@ namespace AuroraCore
 	namespace Math
 	{
 
+		enum Axes : const size_t;
 
+		class Vec2f;
+
+		class Vec3f;
+
+		class Vec4f;
+
+		class Mat2f;
+
+		class Mat3f;
+
+		class Mat4f;
 
 	}
 

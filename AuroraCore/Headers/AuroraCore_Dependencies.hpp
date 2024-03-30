@@ -12,6 +12,10 @@
 #include <Windows.h>
 
 #include <iostream>
+#include <string>
+#include <chrono>
+#include <thread>
+#include <mutex>
 
 
 
@@ -89,6 +93,8 @@ namespace AuroraCore
 
 
 	}
+
+	class Window;
 
 }
 

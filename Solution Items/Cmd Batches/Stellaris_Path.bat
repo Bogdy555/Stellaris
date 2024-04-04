@@ -8,7 +8,7 @@ if "%SolutionDir%" == "" call vcvars64.bat
 
 echo on
 
-if "%SolutionDir%" == "" set SolutionDir=C:\Users\Bogdan\source\repos\Stellaris\
+if "%SolutionDir%" == "" set SolutionDir=D:\projects\c++\Stellaris\
 
 @echo off
 

@@ -62,14 +62,19 @@ namespace AuroraCore
 	namespace Sound
 	{
 
-
+		class Buffer;
 
 	}
 
 	namespace Graphics
 	{
 
+		namespace GL
+		{
 
+
+
+		}
 
 	}
 

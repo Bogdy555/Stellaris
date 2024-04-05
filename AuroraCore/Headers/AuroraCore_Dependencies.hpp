@@ -60,7 +60,7 @@ namespace AuroraCore
 	namespace Sound
 	{
 
-
+		class Buffer;
 
 	}
 
@@ -69,6 +69,13 @@ namespace AuroraCore
 		namespace Assets 
 		{
 			class Image;
+		}
+
+		namespace GL
+		{
+
+
+
 		}
 	}
 

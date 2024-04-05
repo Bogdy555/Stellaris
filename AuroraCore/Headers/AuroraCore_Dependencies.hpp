@@ -28,9 +28,7 @@ namespace AuroraCore
 
 	namespace Time
 	{
-
-
-
+		class Timer;
 	}
 
 	namespace Math
@@ -68,9 +66,10 @@ namespace AuroraCore
 
 	namespace Graphics
 	{
-
-
-
+		namespace Assets 
+		{
+			class Image;
+		}
 	}
 
 	namespace Networking

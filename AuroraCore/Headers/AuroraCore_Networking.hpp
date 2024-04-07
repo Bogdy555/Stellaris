@@ -29,9 +29,9 @@ namespace AuroraCore
 			EndPoint(EndPoint&& _Other) noexcept;
 			~EndPoint();
 
-			bool Host(const AURORA_CORE_CHAR* _Address, const AURORA_CORE_CHAR* _Port);
+			bool Host(const wchar_t* _Address, const wchar_t* _Port);
 			bool GetNextClient(EndPoint& _NextClient, sockaddr* _Address = nullptr);
-			bool Connect(const AURORA_CORE_CHAR* _Address, const AURORA_CORE_CHAR* _Port);
+			bool Connect(const wchar_t* _Address, const wchar_t* _Port);
 			void Disconnect();
 
 			bool SendBuff(const uint8_t* _Buff, const size_t _BuffSize);

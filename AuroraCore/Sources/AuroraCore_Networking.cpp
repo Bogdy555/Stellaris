@@ -38,7 +38,7 @@ AuroraCore::Networking::EndPoint::~EndPoint()
 	AURORA_CORE_ASSERT_MSG(Socket == INVALID_SOCKET, AURORA_CORE_STRING_PREFIX("~EndPoint hit before cleanup!"));
 }
 
-bool AuroraCore::Networking::EndPoint::Host(const AURORA_CORE_CHAR* _Address, const AURORA_CORE_CHAR* _Port)
+bool AuroraCore::Networking::EndPoint::Host(const wchar_t* _Address, const wchar_t* _Port)
 {
 	Disconnect();
 
@@ -125,7 +125,7 @@ bool AuroraCore::Networking::EndPoint::GetNextClient(EndPoint& _NextClient, sock
 	return true;
 }
 
-bool AuroraCore::Networking::EndPoint::Connect(const AURORA_CORE_CHAR* _Address, const AURORA_CORE_CHAR* _Port)
+bool AuroraCore::Networking::EndPoint::Connect(const wchar_t* _Address, const wchar_t* _Port)
 {
 	Disconnect();
 

@@ -5,11 +5,14 @@
 
 
 #pragma comment(lib, "Winmm.lib")
+#pragma comment(lib, "Dsound.lib")
+#pragma comment(lib, "dxguid.lib")
 
 
 
 #include "AuroraCore_WinTargetVer.hpp"
 #include <Windows.h>
+#include <dsound.h>
 
 #include <iostream>
 #include <string>
@@ -62,7 +65,17 @@ namespace AuroraCore
 	namespace Sound
 	{
 
+		struct Device;
 
+		class Context;
+
+		class Buffer;
+
+		class Buffer3D;
+
+		class Source;
+
+		class Source3D;
 
 	}
 

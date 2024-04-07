@@ -6,10 +6,6 @@
 
 
 
-#ifdef _WIN32
-
-
-
 WSADATA AuroraCore::Networking::WSAData = { 0 };
 
 
@@ -24,10 +20,6 @@ void AuroraCore::Networking::Stop()
 	WSACleanup();
 	WSAData = { 0 };
 }
-
-
-
-#endif
 
 
 
@@ -46,20 +38,20 @@ AuroraCore::Networking::EndPoint::~EndPoint()
 	AURORA_CORE_ASSERT_MSG(Socket == INVALID_SOCKET, AURORA_CORE_STRING_PREFIX("~EndPoint hit before cleanup!"));
 }
 
-bool AuroraCore::Networking::EndPoint::Host(const char* _Address, const char* _Port)
+bool AuroraCore::Networking::EndPoint::Host(const AURORA_CORE_CHAR* _Address, const AURORA_CORE_CHAR* _Port)
 {
 	Disconnect();
 
-	addrinfo* _AddressInfo = nullptr;
+	ADDRINFOW* _AddressInfo = nullptr;
 
 	{
-		addrinfo _AddressHint = { 0 };
+		ADDRINFOW _AddressHint = { 0 };
 
 		_AddressHint.ai_family = AF_INET;
 		_AddressHint.ai_socktype = SOCK_STREAM;
 		_AddressHint.ai_protocol = IPPROTO_TCP;
 
-		if (getaddrinfo(_Address, _Port, &_AddressHint, &_AddressInfo) != NO_ERROR)
+		if (GetAddrInfoW(_Address, _Port, &_AddressHint, &_AddressInfo) != NO_ERROR)
 		{
 			return false;
 		}
@@ -69,7 +61,7 @@ bool AuroraCore::Networking::EndPoint::Host(const char* _Address, const char* _P
 
 	if (Socket == INVALID_SOCKET)
 	{
-		freeaddrinfo(_AddressInfo);
+		FreeAddrInfoW(_AddressInfo);
 		return false;
 	}
 
@@ -77,11 +69,11 @@ bool AuroraCore::Networking::EndPoint::Host(const char* _Address, const char* _P
 	{
 		closesocket(Socket);
 		Socket = INVALID_SOCKET;
-		freeaddrinfo(_AddressInfo);
+		FreeAddrInfoW(_AddressInfo);
 		return false;
 	}
 
-	freeaddrinfo(_AddressInfo);
+	FreeAddrInfoW(_AddressInfo);
 
 	if (listen(Socket, AURORA_CORE_LISTEN_MAX) != NO_ERROR)
 	{
@@ -133,20 +125,20 @@ bool AuroraCore::Networking::EndPoint::GetNextClient(EndPoint& _NextClient, sock
 	return true;
 }
 
-bool AuroraCore::Networking::EndPoint::Connect(const char* _Address, const char* _Port)
+bool AuroraCore::Networking::EndPoint::Connect(const AURORA_CORE_CHAR* _Address, const AURORA_CORE_CHAR* _Port)
 {
 	Disconnect();
 
-	addrinfo* _AddressInfo = nullptr;
+	ADDRINFOW* _AddressInfo = nullptr;
 
 	{
-		addrinfo _AddressHint = { 0 };
+		ADDRINFOW _AddressHint = { 0 };
 
 		_AddressHint.ai_family = AF_INET;
 		_AddressHint.ai_socktype = SOCK_STREAM;
 		_AddressHint.ai_protocol = IPPROTO_TCP;
 
-		if (getaddrinfo(_Address, _Port, &_AddressHint, &_AddressInfo) != NO_ERROR)
+		if (GetAddrInfoW(_Address, _Port, &_AddressHint, &_AddressInfo) != NO_ERROR)
 		{
 			return false;
 		}
@@ -156,7 +148,7 @@ bool AuroraCore::Networking::EndPoint::Connect(const char* _Address, const char*
 
 	if (Socket == INVALID_SOCKET)
 	{
-		freeaddrinfo(_AddressInfo);
+		FreeAddrInfoW(_AddressInfo);
 		return false;
 	}
 
@@ -164,11 +156,11 @@ bool AuroraCore::Networking::EndPoint::Connect(const char* _Address, const char*
 	{
 		closesocket(Socket);
 		Socket = INVALID_SOCKET;
-		freeaddrinfo(_AddressInfo);
+		FreeAddrInfoW(_AddressInfo);
 		return false;
 	}
 
-	freeaddrinfo(_AddressInfo);
+	FreeAddrInfoW(_AddressInfo);
 
 	return true;
 }
@@ -181,7 +173,7 @@ void AuroraCore::Networking::EndPoint::Disconnect()
 	}
 
 	closesocket(Socket);
-	
+
 	Socket = INVALID_SOCKET;
 }
 
@@ -629,6 +621,26 @@ bool AuroraCore::Networking::EndPoint::SendUInt64(const uint64_t _Value)
 	return true;
 }
 
+bool AuroraCore::Networking::EndPoint::SendFloat(const float _Value)
+{
+	int32_t _Mantisa = 0;
+	int32_t _Exponent = 0;
+
+	_Mantisa = (int32_t)(frexp(_Value, &_Exponent) * 10000.0f);
+
+	if (!SendInt32(_Mantisa))
+	{
+		return false;
+	}
+
+	if (!SendInt32(_Exponent))
+	{
+		return false;
+	}
+
+	return true;
+}
+
 bool AuroraCore::Networking::EndPoint::RecvBuff(uint8_t* _Buff, const size_t _BuffSize)
 {
 	if (Socket == INVALID_SOCKET)
@@ -1064,6 +1076,26 @@ bool AuroraCore::Networking::EndPoint::RecvUInt64(uint64_t& _Value)
 	return true;
 }
 
+bool AuroraCore::Networking::EndPoint::RecvFloat(float& _Value)
+{
+	int32_t _Mantisa = 0;
+	int32_t _Exponent = 0;
+
+	if (!RecvInt32(_Mantisa))
+	{
+		return false;
+	}
+
+	if (!RecvInt32(_Exponent))
+	{
+		return false;
+	}
+
+	_Value = (float)(_Mantisa) / 10000.0f * pow(2.0f, (float)(_Exponent));
+
+	return true;
+}
+
 AuroraCore::Networking::EndPoint::operator const SOCKET() const
 {
 	return Socket;
@@ -1079,4 +1111,3 @@ AuroraCore::Networking::EndPoint& AuroraCore::Networking::EndPoint::operator= (E
 
 	return *this;
 }
-

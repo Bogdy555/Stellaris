@@ -14,14 +14,10 @@ namespace AuroraCore
 	namespace Networking
 	{
 
-#ifdef _WIN32
-
 		extern WSADATA WSAData;
 
 		bool Init();
 		void Stop();
-
-#endif
 
 		class EndPoint
 		{
@@ -33,9 +29,9 @@ namespace AuroraCore
 			EndPoint(EndPoint&& _Other) noexcept;
 			~EndPoint();
 
-			bool Host(const char* _Address, const char* _Port);
+			bool Host(const AURORA_CORE_CHAR* _Address, const AURORA_CORE_CHAR* _Port);
 			bool GetNextClient(EndPoint& _NextClient, sockaddr* _Address = nullptr);
-			bool Connect(const char* _Address, const char* _Port);
+			bool Connect(const AURORA_CORE_CHAR* _Address, const AURORA_CORE_CHAR* _Port);
 			void Disconnect();
 
 			bool SendBuff(const uint8_t* _Buff, const size_t _BuffSize);
@@ -47,6 +43,7 @@ namespace AuroraCore
 			bool SendUInt16(const uint16_t _Value);
 			bool SendUInt32(const uint32_t _Value);
 			bool SendUInt64(const uint64_t _Value);
+			bool SendFloat(const float _Value);
 			bool RecvBuff(uint8_t* _Buff, const size_t _BuffSize);
 			bool RecvInt8(int8_t& _Value);
 			bool RecvInt16(int16_t& _Value);
@@ -56,6 +53,7 @@ namespace AuroraCore
 			bool RecvUInt16(uint16_t& _Value);
 			bool RecvUInt32(uint32_t& _Value);
 			bool RecvUInt64(uint64_t& _Value);
+			bool RecvFloat(float& _Value);
 
 			operator const SOCKET() const;
 

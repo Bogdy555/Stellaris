@@ -10,6 +10,29 @@ const std::vector<AuroraCore::Sound::Device>& AuroraCore::Sound::Devices = _Devi
 
 
 
+uint8_t* AuroraCore::Sound::LoadAudioFile(const wchar_t* _Path, size_t& _Size, WAVEFORMATEX& _AudioInfo)
+{
+	_Size = 0;
+	_AudioInfo = { 0 };
+
+	return nullptr;
+}
+
+uint8_t* AuroraCore::Sound::LoadAudioResource(const HINSTANCE _InstanceHandle, const uint32_t _ResourceId, size_t& _Size, WAVEFORMATEX& _AudioInfo)
+{
+	_Size = 0;
+	_AudioInfo = { 0 };
+
+	return nullptr;
+}
+
+bool AuroraCore::Sound::SaveAudioFile(const wchar_t* _Path, const uint8_t* _Data, const size_t _Size, const WAVEFORMATEX& _AudioInfo)
+{
+	return false;
+}
+
+
+
 static BOOL CALLBACK GetDevices(LPGUID _Id, LPCWSTR _Name, LPCWSTR _Driver, LPVOID _Context)
 {
 	AuroraCore::Sound::Device _Device;

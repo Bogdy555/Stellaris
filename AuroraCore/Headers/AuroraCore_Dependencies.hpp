@@ -71,6 +71,12 @@ namespace AuroraCore
 	namespace Graphics
 	{
 
+		namespace Assets
+		{
+			
+			class Image;
+
+		}
 
 
 	}

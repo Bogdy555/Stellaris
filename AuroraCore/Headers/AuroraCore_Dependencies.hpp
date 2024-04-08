@@ -31,7 +31,7 @@ namespace AuroraCore
 	namespace Time
 	{
 
-
+		class Timer;
 
 	}
 

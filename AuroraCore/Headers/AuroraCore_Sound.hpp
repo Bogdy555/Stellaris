@@ -48,6 +48,11 @@ namespace AuroraCore
 			bool SetOrientation(const Math::Vec3f& _Front, const Math::Vec3f& _Up);
 			bool SetVelocity(const Math::Vec3f& _Velocity);
 
+			const bool GetVolume(float& _Volume) const;
+			const bool GetPosition(Math::Vec3f& _Position) const;
+			const bool GetOrientation(Math::Vec3f& _Front, Math::Vec3f& _Up) const;
+			const bool GetVelocity(Math::Vec3f& _Velocity) const;
+
 			bool CommitChanges();
 
 			const bool CheckCreated() const;
@@ -139,7 +144,18 @@ namespace AuroraCore
 			bool Create(Context& _Context, Buffer& _Buffer);
 			void Destroy();
 
+			bool SetVolume(const float _Volume);
+			bool SetFrequency(const float _Frequency);
+
+			const bool GetVolume(float& _Volume) const;
+			const bool GetFrequency(float& _Frequency) const;
+
+			bool Play(const bool _Looping);
+			bool Stop();
+
 			const bool CheckCreated() const;
+			const bool IsPlaying() const;
+			const bool IsLooping() const;
 
 			Source& operator= (const Source& _Other) = delete;
 			Source& operator= (Source&& _Other) noexcept;
@@ -147,6 +163,8 @@ namespace AuroraCore
 		private:
 
 			IDirectSoundBuffer8* DirectSoundBuffer;
+			bool Playing;
+			bool Looping;
 
 		};
 
@@ -163,7 +181,26 @@ namespace AuroraCore
 			bool Create(Context& _Context, Buffer3D& _Buffer);
 			void Destroy();
 
+			bool SetVolume(const float _Volume);
+			bool SetFrequency(const float _Frequency);
+			bool SetPosition(const Math::Vec3f& _Position);
+			bool SetVelocity(const Math::Vec3f& _Velocity);
+			bool SetMinDistance(const float _Distance);
+			bool SetMaxDistance(const float _Distance);
+
+			const bool GetVolume(float& _Volume) const;
+			const bool GetFrequency(float& _Frequency) const;
+			const bool GetPosition(Math::Vec3f& _Position) const;
+			const bool GetVelocity(Math::Vec3f& _Velocity) const;
+			const bool GetMinDistance(float& _Distance) const;
+			const bool GetMaxDistance(float& _Distance) const;
+
+			bool Play(const bool _Looping);
+			bool Stop();
+
 			const bool CheckCreated() const;
+			const bool IsPlaying() const;
+			const bool IsLooping() const;
 
 			Source3D& operator= (const Source3D& _Other) = delete;
 			Source3D& operator= (Source3D&& _Other) noexcept;
@@ -172,6 +209,8 @@ namespace AuroraCore
 
 			IDirectSoundBuffer8* DirectSoundBuffer;
 			IDirectSound3DBuffer8* DirectSound3DBuffer;
+			bool Playing;
+			bool Looping;
 
 		};
 

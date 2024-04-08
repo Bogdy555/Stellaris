@@ -274,35 +274,23 @@ bool AuroraCore::Sound::Buffer::Create(Context& _Context, const size_t _Size, co
 		return false;
 	}
 
-	WAVEFORMATEX _TempBufferAudioInfo = _AudioInfo;
+	WAVEFORMATEX _BufferAudioInfo = _AudioInfo;
 
-	DSBUFFERDESC _TempBufferDesc = { 0 };
+	DSBUFFERDESC _BufferDesc = { 0 };
 
-	_TempBufferDesc.dwSize = sizeof(DSBUFFERDESC);
-	_TempBufferDesc.dwFlags = DSBCAPS_CTRLFREQUENCY | DSBCAPS_CTRLVOLUME | DSBCAPS_GLOBALFOCUS;
-	_TempBufferDesc.dwBufferBytes = (DWORD)(_Size);
-	_TempBufferDesc.dwReserved = 0;
-	_TempBufferDesc.lpwfxFormat = &_TempBufferAudioInfo;
-	_TempBufferDesc.guid3DAlgorithm = DS3DALG_DEFAULT;
+	_BufferDesc.dwSize = sizeof(DSBUFFERDESC);
+	_BufferDesc.dwFlags = DSBCAPS_CTRLFREQUENCY | DSBCAPS_CTRLVOLUME | DSBCAPS_GLOBALFOCUS;
+	_BufferDesc.dwBufferBytes = (DWORD)(_Size);
+	_BufferDesc.dwReserved = 0;
+	_BufferDesc.lpwfxFormat = &_BufferAudioInfo;
+	_BufferDesc.guid3DAlgorithm = DS3DALG_DEFAULT;
 
-	IDirectSoundBuffer* _TempBuffer = nullptr;
-
-	HRESULT _Result = _Context.DirectSoundContext->CreateSoundBuffer(&_TempBufferDesc, &_TempBuffer, nullptr);
+	HRESULT _Result = _Context.DirectSoundContext->CreateSoundBuffer(&_BufferDesc, &DirectSoundBuffer, nullptr);
 
 	if (_Result != S_OK)
 	{
 		return false;
 	}
-
-	_Result = _TempBuffer->QueryInterface(IID_IDirectSoundBuffer8, (void**)(DirectSoundBuffer));
-
-	if (_Result != S_OK)
-	{
-		AURORA_CORE_COM_RELEASE(_TempBuffer);
-		return false;
-	}
-
-	AURORA_CORE_COM_RELEASE(_TempBuffer);
 
 	if (_Data)
 	{
@@ -426,35 +414,23 @@ bool AuroraCore::Sound::Buffer3D::Create(Context& _Context, const size_t _Size, 
 		return false;
 	}
 
-	WAVEFORMATEX _TempBufferAudioInfo = _AudioInfo;
+	WAVEFORMATEX _BufferAudioInfo = _AudioInfo;
 
-	DSBUFFERDESC _TempBufferDesc = { 0 };
+	DSBUFFERDESC _BufferDesc = { 0 };
 
-	_TempBufferDesc.dwSize = sizeof(DSBUFFERDESC);
-	_TempBufferDesc.dwFlags = DSBCAPS_CTRL3D | DSBCAPS_CTRLFREQUENCY | DSBCAPS_CTRLVOLUME | DSBCAPS_GLOBALFOCUS;
-	_TempBufferDesc.dwBufferBytes = (DWORD)(_Size);
-	_TempBufferDesc.dwReserved = 0;
-	_TempBufferDesc.lpwfxFormat = &_TempBufferAudioInfo;
-	_TempBufferDesc.guid3DAlgorithm = DS3DALG_DEFAULT;
+	_BufferDesc.dwSize = sizeof(DSBUFFERDESC);
+	_BufferDesc.dwFlags = DSBCAPS_CTRL3D | DSBCAPS_CTRLFREQUENCY | DSBCAPS_CTRLVOLUME | DSBCAPS_GLOBALFOCUS;
+	_BufferDesc.dwBufferBytes = (DWORD)(_Size);
+	_BufferDesc.dwReserved = 0;
+	_BufferDesc.lpwfxFormat = &_BufferAudioInfo;
+	_BufferDesc.guid3DAlgorithm = DS3DALG_DEFAULT;
 
-	IDirectSoundBuffer* _TempBuffer = nullptr;
-
-	HRESULT _Result = _Context.DirectSoundContext->CreateSoundBuffer(&_TempBufferDesc, &_TempBuffer, nullptr);
+	HRESULT _Result = _Context.DirectSoundContext->CreateSoundBuffer(&_BufferDesc, &DirectSoundBuffer, nullptr);
 
 	if (_Result != S_OK)
 	{
 		return false;
 	}
-
-	_Result = _TempBuffer->QueryInterface(IID_IDirectSoundBuffer8, (void**)(DirectSoundBuffer));
-
-	if (_Result != S_OK)
-	{
-		AURORA_CORE_COM_RELEASE(_TempBuffer);
-		return false;
-	}
-
-	AURORA_CORE_COM_RELEASE(_TempBuffer);
 
 	if (_Data)
 	{
@@ -578,7 +554,24 @@ bool AuroraCore::Sound::Source::Create(Context& _Context, Buffer& _Buffer)
 		return false;
 	}
 
+	IDirectSoundBuffer* _TempBuffer = nullptr;
 
+	HRESULT _Result = _Context.DirectSoundContext->DuplicateSoundBuffer(_Buffer.DirectSoundBuffer, &_TempBuffer);
+
+	if (_Result != S_OK)
+	{
+		return false;
+	}
+
+	_Result = _TempBuffer->QueryInterface(IID_IDirectSoundBuffer8, (void**)(&DirectSoundBuffer));
+
+	if (_Result != S_OK)
+	{
+		AURORA_CORE_COM_RELEASE(_TempBuffer);
+		return false;
+	}
+
+	AURORA_CORE_COM_RELEASE(_TempBuffer);
 
 	return true;
 }
@@ -631,7 +624,32 @@ bool AuroraCore::Sound::Source3D::Create(Context& _Context, Buffer3D& _Buffer)
 		return false;
 	}
 
+	IDirectSoundBuffer* _TempBuffer = nullptr;
 
+	HRESULT _Result = _Context.DirectSoundContext->DuplicateSoundBuffer(_Buffer.DirectSoundBuffer, &_TempBuffer);
+
+	if (_Result != S_OK)
+	{
+		return false;
+	}
+
+	_Result = _TempBuffer->QueryInterface(IID_IDirectSoundBuffer8, (void**)(&DirectSoundBuffer));
+
+	if (_Result != S_OK)
+	{
+		AURORA_CORE_COM_RELEASE(_TempBuffer);
+		return false;
+	}
+
+	AURORA_CORE_COM_RELEASE(_TempBuffer);
+
+	_Result = DirectSoundBuffer->QueryInterface(IID_IDirectSound3DBuffer8, (void**)(&DirectSound3DBuffer));
+
+	if (_Result != S_OK)
+	{
+		Destroy();
+		return false;
+	}
 
 	return true;
 }

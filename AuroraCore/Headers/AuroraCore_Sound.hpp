@@ -1,3 +1,10 @@
+//GetCurrentPosition
+//SetCurrentPosition
+//Play
+//Stop
+//SetFrequency
+//SetVolume
+
 #ifndef AuroraCore_Sound_hpp
 
 #define AuroraCore_Sound_hpp
@@ -89,7 +96,7 @@ namespace AuroraCore
 
 			friend Source;
 
-			IDirectSoundBuffer8* DirectSoundBuffer;
+			IDirectSoundBuffer* DirectSoundBuffer;
 
 		};
 
@@ -118,7 +125,7 @@ namespace AuroraCore
 
 			friend Source3D;
 
-			IDirectSoundBuffer8* DirectSoundBuffer;
+			IDirectSoundBuffer* DirectSoundBuffer;
 
 		};
 

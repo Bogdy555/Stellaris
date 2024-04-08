@@ -71,13 +71,17 @@ namespace AuroraCore
 	namespace Graphics
 	{
 
+		namespace GL
+		{
+
+		}
+
 		namespace Assets
 		{
 			
 			class Image;
 
 		}
-
 
 	}
 

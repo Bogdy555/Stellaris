@@ -19,7 +19,9 @@ namespace AuroraCore
 
 		class Timer
 		{
+
 		public:
+
 			Timer();
 			Timer(const Timer& _Other);
 			Timer(Timer&& _Other) noexcept;
@@ -35,8 +37,10 @@ namespace AuroraCore
 			Timer& operator= (Timer&& _Other) noexcept;
 
 		private:
+
 			std::chrono::system_clock::time_point Begin;
 			std::chrono::system_clock::time_point End;
+
 		};
 
 	}

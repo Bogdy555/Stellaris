@@ -2,42 +2,44 @@
 
 
 
-static TIMECAPS _TimeCaps = { 0 };
-static bool initialized = false;
+static TIMECAPS TimeCaps = { 0 };
+static bool Initialized = false;
 
 
 
 bool AuroraCore::Time::Init()
 {
-	if (initialized == true)
+	if (Initialized == true)
 	{
 		return true;
 	}
 
-	if (timeGetDevCaps(&_TimeCaps, sizeof(TIMECAPS)) != MMSYSERR_NOERROR)
+	if (timeGetDevCaps(&TimeCaps, sizeof(TIMECAPS)) != MMSYSERR_NOERROR)
 	{
 		return false;
 	}
 
-	if (timeBeginPeriod(_TimeCaps.wPeriodMin) != TIMERR_NOERROR)
+	if (timeBeginPeriod(TimeCaps.wPeriodMin) != TIMERR_NOERROR)
 	{
 		return false;
 	}
 
-	initialized = true;
+	Initialized = true;
+
 	return true;
 }
 
 void AuroraCore::Time::Stop()
 {
-	if (!initialized)
+	if (!Initialized)
 	{
 		return;
 	}
-	timeEndPeriod(_TimeCaps.wPeriodMin);
 
-	initialized = false;
-	_TimeCaps = { 0 };
+	timeEndPeriod(TimeCaps.wPeriodMin);
+
+	Initialized = false;
+	TimeCaps = { 0 };
 }
 
 
@@ -99,6 +101,3 @@ AuroraCore::Time::Timer& AuroraCore::Time::Timer::operator= (Timer&& _Other) noe
 
 	return *this;
 }
-
-
-

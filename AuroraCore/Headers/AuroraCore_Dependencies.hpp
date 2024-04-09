@@ -92,7 +92,9 @@ namespace AuroraCore
 	namespace Physics
 	{
 
+		struct AABB;
 
+		class HitBox;
 
 	}
 

@@ -14,6 +14,13 @@ namespace AuroraCore
 	namespace Sound
 	{
 
+		struct CPUBuffer
+		{
+			size_t Size = 0;
+			uint8_t* Data = nullptr;
+			WAVEFORMATEX AudioInfo = { 0 };
+		};
+
 		uint8_t* LoadAudioFile(const wchar_t* _Path, size_t& _Size, WAVEFORMATEX& _AudioInfo);
 		uint8_t* LoadAudioResource(const HINSTANCE _InstanceHandle, const uint32_t _ResourceId, size_t& _Size, WAVEFORMATEX& _AudioInfo);
 		bool SaveAudioFile(const wchar_t* _Path, const uint8_t* _Data, const size_t _Size, const WAVEFORMATEX& _AudioInfo);
@@ -29,6 +36,7 @@ namespace AuroraCore
 
 		bool UpdateDevices();
 		void CleanDevices();
+		size_t GetDefaultDeviceIndex();
 
 		class Context
 		{

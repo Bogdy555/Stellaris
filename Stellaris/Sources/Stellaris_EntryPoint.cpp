@@ -77,7 +77,7 @@ int WINAPI wWinMain(_In_ HINSTANCE _hInstance, _In_opt_ HINSTANCE _hPrevInstance
 
 	AuroraCore::Sound::Context _Context;
 
-	if (!_Context.Create(0))
+	if (!_Context.Create(AuroraCore::Sound::GetDefaultDeviceIndex()))
 	{
 		AuroraCore::Sound::CleanDevices();
 		CoUninitialize();

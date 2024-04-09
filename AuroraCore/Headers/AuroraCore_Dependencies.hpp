@@ -13,6 +13,7 @@
 #include "AuroraCore_WinTargetVer.hpp"
 #include <Windows.h>
 #include <dsound.h>
+#include <mmdeviceapi.h>
 
 #include <iostream>
 #include <string>
@@ -64,6 +65,8 @@ namespace AuroraCore
 
 	namespace Sound
 	{
+
+		struct CPUBuffer;
 
 		struct Device;
 

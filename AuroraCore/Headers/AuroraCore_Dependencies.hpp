@@ -11,6 +11,8 @@
 
 
 #include "AuroraCore_WinTargetVer.hpp"
+#include <WinSock2.h>
+#include <WS2tcpip.h>
 #include <Windows.h>
 #include <dsound.h>
 #include <mmdeviceapi.h>
@@ -33,7 +35,7 @@ namespace AuroraCore
 	namespace Time
 	{
 
-
+		class Timer;
 
 	}
 
@@ -92,7 +94,7 @@ namespace AuroraCore
 	namespace Networking
 	{
 
-
+		class EndPoint;
 
 	}
 

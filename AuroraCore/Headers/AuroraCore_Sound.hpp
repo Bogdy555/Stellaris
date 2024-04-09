@@ -187,6 +187,9 @@ namespace AuroraCore
 			bool SetVelocity(const Math::Vec3f& _Velocity);
 			bool SetMinDistance(const float _Distance);
 			bool SetMaxDistance(const float _Distance);
+			bool SetConeAngles(const uint32_t _Inside, const uint32_t _Outside);
+			bool SetConeOrientation(const Math::Vec3f& _Orientation);
+			bool SetConeOutsideVolume(const float _Volume);
 
 			const bool GetVolume(float& _Volume) const;
 			const bool GetFrequency(float& _Frequency) const;
@@ -194,6 +197,9 @@ namespace AuroraCore
 			const bool GetVelocity(Math::Vec3f& _Velocity) const;
 			const bool GetMinDistance(float& _Distance) const;
 			const bool GetMaxDistance(float& _Distance) const;
+			const bool GetConeAngles(uint32_t& _Inside, uint32_t& _Outside) const;
+			const bool GetConeOrientation(Math::Vec3f& _Orientation) const;
+			const bool GetConeOutsideVolume(float& _Volume) const;
 
 			bool Play(const bool _Looping);
 			bool Stop();

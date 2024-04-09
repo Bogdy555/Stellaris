@@ -1019,6 +1019,57 @@ bool AuroraCore::Sound::Source3D::SetMaxDistance(const float _Distance)
 	return true;
 }
 
+bool AuroraCore::Sound::Source3D::SetConeAngles(const uint32_t _Inside, const uint32_t _Outside)
+{
+	if (!CheckCreated())
+	{
+		return false;
+	}
+
+	HRESULT _Result = DirectSound3DBuffer->SetConeAngles(_Inside, _Outside, DS3D_DEFERRED);
+
+	if (_Result != S_OK)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+bool AuroraCore::Sound::Source3D::SetConeOrientation(const Math::Vec3f& _Orientation)
+{
+	if (!CheckCreated())
+	{
+		return false;
+	}
+
+	HRESULT _Result = DirectSound3DBuffer->SetConeOrientation(_Orientation.x, _Orientation.y, _Orientation.z, DS3D_DEFERRED);
+
+	if (_Result != S_OK)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+bool AuroraCore::Sound::Source3D::SetConeOutsideVolume(const float _Volume)
+{
+	if (!CheckCreated())
+	{
+		return false;
+	}
+
+	HRESULT _Result = DirectSound3DBuffer->SetConeOutsideVolume(DSBVOLUME_MIN + (LONG)((float)(DSBVOLUME_MAX - DSBVOLUME_MIN) * _Volume), DS3D_DEFERRED);
+
+	if (_Result != S_OK)
+	{
+		return false;
+	}
+
+	return true;
+}
+
 const bool AuroraCore::Sound::Source3D::GetVolume(float& _Volume) const
 {
 	if (!CheckCreated())
@@ -1145,6 +1196,73 @@ const bool AuroraCore::Sound::Source3D::GetMaxDistance(float& _Distance) const
 	}
 
 	_Distance = _AuxDistance;
+
+	return true;
+}
+
+const bool AuroraCore::Sound::Source3D::GetConeAngles(uint32_t& _Inside, uint32_t& _Outside) const
+{
+	if (!CheckCreated())
+	{
+		return false;
+	}
+
+	DWORD _AuxInside = 0;
+	DWORD _AuxOutside = 0;
+
+	HRESULT _Result = DirectSound3DBuffer->GetConeAngles(&_AuxInside, &_AuxOutside);
+
+	if (_Result != S_OK)
+	{
+		return false;
+	}
+
+	_Inside = _AuxInside;
+	_Outside = _AuxOutside;
+
+	return true;
+}
+
+const bool AuroraCore::Sound::Source3D::GetConeOrientation(Math::Vec3f& _Orientation) const
+{
+	if (!CheckCreated())
+	{
+		return false;
+	}
+
+	D3DVECTOR _AuxOrientation;
+
+	HRESULT _Result = DirectSound3DBuffer->GetConeOrientation(&_AuxOrientation);
+
+	if (_Result != S_OK)
+	{
+		return false;
+	}
+
+	_Orientation.x = _AuxOrientation.x;
+	_Orientation.y = _AuxOrientation.y;
+	_Orientation.z = _AuxOrientation.z;
+
+	return true;
+}
+
+const bool AuroraCore::Sound::Source3D::GetConeOutsideVolume(float& _Volume) const
+{
+	if (!CheckCreated())
+	{
+		return false;
+	}
+
+	LONG _AuxVolume = 0;
+
+	HRESULT _Result = DirectSound3DBuffer->GetConeOutsideVolume(&_AuxVolume);
+
+	if (_Result != S_OK)
+	{
+		return false;
+	}
+
+	_Volume = (float)(_AuxVolume - DSBVOLUME_MIN) / (float)(DSBVOLUME_MAX - DSBVOLUME_MIN);
 
 	return true;
 }

@@ -183,14 +183,14 @@ bool AuroraCore::Sound::Context::SetVolume(const float _Volume)
 	return true;
 }
 
-bool AuroraCore::Sound::Context::SetPosition(const Math::Vec3f& _Position)
+bool AuroraCore::Sound::Context::SetPosition(const Math::Vec3f& _Position, const bool _Deferred)
 {
 	if (!CheckCreated())
 	{
 		return false;
 	}
 
-	HRESULT _Result = Listener->SetPosition(_Position.x, _Position.y, _Position.z, DS3D_DEFERRED);
+	HRESULT _Result = Listener->SetPosition(_Position.x, _Position.y, _Position.z, _Deferred ? DS3D_DEFERRED : DS3D_IMMEDIATE);
 
 	if (_Result != S_OK)
 	{
@@ -200,14 +200,14 @@ bool AuroraCore::Sound::Context::SetPosition(const Math::Vec3f& _Position)
 	return true;
 }
 
-bool AuroraCore::Sound::Context::SetOrientation(const Math::Vec3f& _Front, const Math::Vec3f& _Up)
+bool AuroraCore::Sound::Context::SetOrientation(const Math::Vec3f& _Front, const Math::Vec3f& _Up, const bool _Deferred)
 {
 	if (!CheckCreated())
 	{
 		return false;
 	}
 
-	HRESULT _Result = Listener->SetOrientation(_Front.x, _Front.y, _Front.z, _Up.x, _Up.y, _Up.z, DS3D_DEFERRED);
+	HRESULT _Result = Listener->SetOrientation(_Front.x, _Front.y, _Front.z, _Up.x, _Up.y, _Up.z, _Deferred ? DS3D_DEFERRED : DS3D_IMMEDIATE);
 
 	if (_Result != S_OK)
 	{
@@ -217,14 +217,14 @@ bool AuroraCore::Sound::Context::SetOrientation(const Math::Vec3f& _Front, const
 	return true;
 }
 
-bool AuroraCore::Sound::Context::SetVelocity(const Math::Vec3f& _Velocity)
+bool AuroraCore::Sound::Context::SetVelocity(const Math::Vec3f& _Velocity, const bool _Deferred)
 {
 	if (!CheckCreated())
 	{
 		return false;
 	}
 
-	HRESULT _Result = Listener->SetVelocity(_Velocity.x, _Velocity.y, _Velocity.z, DS3D_DEFERRED);
+	HRESULT _Result = Listener->SetVelocity(_Velocity.x, _Velocity.y, _Velocity.z, _Deferred ? DS3D_DEFERRED : DS3D_IMMEDIATE);
 
 	if (_Result != S_OK)
 	{
@@ -738,6 +738,23 @@ bool AuroraCore::Sound::Source::SetFrequency(const float _Frequency)
 	return true;
 }
 
+bool AuroraCore::Sound::Source::SetCurrentPosition(const size_t _CurrentPosition)
+{
+	if (!CheckCreated())
+	{
+		return false;
+	}
+
+	HRESULT _Result = DirectSoundBuffer->SetCurrentPosition(_CurrentPosition);
+
+	if (_Result != S_OK)
+	{
+		return false;
+	}
+
+	return true;
+}
+
 const bool AuroraCore::Sound::Source::GetVolume(float& _Volume) const
 {
 	if (!CheckCreated())
@@ -780,11 +797,37 @@ const bool AuroraCore::Sound::Source::GetFrequency(float& _Frequency) const
 	return true;
 }
 
+const bool AuroraCore::Sound::Source::GetCurrentPosition(size_t& _CurrentPosition) const
+{
+	if (!CheckCreated())
+	{
+		return false;
+	}
+
+	DWORD _AuxCurrentPosition = 0;
+
+	HRESULT _Result = DirectSoundBuffer->GetCurrentPosition(&_AuxCurrentPosition, nullptr);
+
+	if (_Result != S_OK)
+	{
+		return false;
+	}
+
+	_CurrentPosition = _AuxCurrentPosition;
+
+	return true;
+}
+
 bool AuroraCore::Sound::Source::Play(const bool _Looping)
 {
 	if (!CheckCreated())
 	{
 		return false;
+	}
+
+	if (Playing)
+	{
+		Stop();
 	}
 
 	HRESULT _Result = DirectSoundBuffer->Play(0, 0, _Looping ? DSBPLAY_LOOPING : NULL);
@@ -951,14 +994,14 @@ bool AuroraCore::Sound::Source3D::SetFrequency(const float _Frequency)
 	return true;
 }
 
-bool AuroraCore::Sound::Source3D::SetPosition(const Math::Vec3f& _Position)
+bool AuroraCore::Sound::Source3D::SetPosition(const Math::Vec3f& _Position, const bool _Deferred)
 {
 	if (!CheckCreated())
 	{
 		return false;
 	}
 
-	HRESULT _Result = DirectSound3DBuffer->SetPosition(_Position.x, _Position.y, _Position.z, DS3D_DEFERRED);
+	HRESULT _Result = DirectSound3DBuffer->SetPosition(_Position.x, _Position.y, _Position.z, _Deferred ? DS3D_DEFERRED : DS3D_IMMEDIATE);
 
 	if (_Result != S_OK)
 	{
@@ -968,14 +1011,14 @@ bool AuroraCore::Sound::Source3D::SetPosition(const Math::Vec3f& _Position)
 	return true;
 }
 
-bool AuroraCore::Sound::Source3D::SetVelocity(const Math::Vec3f& _Velocity)
+bool AuroraCore::Sound::Source3D::SetVelocity(const Math::Vec3f& _Velocity, const bool _Deferred)
 {
 	if (!CheckCreated())
 	{
 		return false;
 	}
 
-	HRESULT _Result = DirectSound3DBuffer->SetVelocity(_Velocity.x, _Velocity.y, _Velocity.z, DS3D_DEFERRED);
+	HRESULT _Result = DirectSound3DBuffer->SetVelocity(_Velocity.x, _Velocity.y, _Velocity.z, _Deferred ? DS3D_DEFERRED : DS3D_IMMEDIATE);
 
 	if (_Result != S_OK)
 	{
@@ -985,14 +1028,14 @@ bool AuroraCore::Sound::Source3D::SetVelocity(const Math::Vec3f& _Velocity)
 	return true;
 }
 
-bool AuroraCore::Sound::Source3D::SetMinDistance(const float _Distance)
+bool AuroraCore::Sound::Source3D::SetMinDistance(const float _Distance, const bool _Deferred)
 {
 	if (!CheckCreated())
 	{
 		return false;
 	}
 
-	HRESULT _Result = DirectSound3DBuffer->SetMinDistance(_Distance, DS3D_DEFERRED);
+	HRESULT _Result = DirectSound3DBuffer->SetMinDistance(_Distance, _Deferred ? DS3D_DEFERRED : DS3D_IMMEDIATE);
 
 	if (_Result != S_OK)
 	{
@@ -1002,14 +1045,14 @@ bool AuroraCore::Sound::Source3D::SetMinDistance(const float _Distance)
 	return true;
 }
 
-bool AuroraCore::Sound::Source3D::SetMaxDistance(const float _Distance)
+bool AuroraCore::Sound::Source3D::SetMaxDistance(const float _Distance, const bool _Deferred)
 {
 	if (!CheckCreated())
 	{
 		return false;
 	}
 
-	HRESULT _Result = DirectSound3DBuffer->SetMaxDistance(_Distance, DS3D_DEFERRED);
+	HRESULT _Result = DirectSound3DBuffer->SetMaxDistance(_Distance, _Deferred ? DS3D_DEFERRED : DS3D_IMMEDIATE);
 
 	if (_Result != S_OK)
 	{
@@ -1019,14 +1062,14 @@ bool AuroraCore::Sound::Source3D::SetMaxDistance(const float _Distance)
 	return true;
 }
 
-bool AuroraCore::Sound::Source3D::SetConeAngles(const uint32_t _Inside, const uint32_t _Outside)
+bool AuroraCore::Sound::Source3D::SetConeAngles(const uint32_t _Inside, const uint32_t _Outside, const bool _Deferred)
 {
 	if (!CheckCreated())
 	{
 		return false;
 	}
 
-	HRESULT _Result = DirectSound3DBuffer->SetConeAngles(_Inside, _Outside, DS3D_DEFERRED);
+	HRESULT _Result = DirectSound3DBuffer->SetConeAngles(_Inside, _Outside, _Deferred ? DS3D_DEFERRED : DS3D_IMMEDIATE);
 
 	if (_Result != S_OK)
 	{
@@ -1036,14 +1079,14 @@ bool AuroraCore::Sound::Source3D::SetConeAngles(const uint32_t _Inside, const ui
 	return true;
 }
 
-bool AuroraCore::Sound::Source3D::SetConeOrientation(const Math::Vec3f& _Orientation)
+bool AuroraCore::Sound::Source3D::SetConeOrientation(const Math::Vec3f& _Orientation, const bool _Deferred)
 {
 	if (!CheckCreated())
 	{
 		return false;
 	}
 
-	HRESULT _Result = DirectSound3DBuffer->SetConeOrientation(_Orientation.x, _Orientation.y, _Orientation.z, DS3D_DEFERRED);
+	HRESULT _Result = DirectSound3DBuffer->SetConeOrientation(_Orientation.x, _Orientation.y, _Orientation.z, _Deferred ? DS3D_DEFERRED : DS3D_IMMEDIATE);
 
 	if (_Result != S_OK)
 	{
@@ -1053,14 +1096,31 @@ bool AuroraCore::Sound::Source3D::SetConeOrientation(const Math::Vec3f& _Orienta
 	return true;
 }
 
-bool AuroraCore::Sound::Source3D::SetConeOutsideVolume(const float _Volume)
+bool AuroraCore::Sound::Source3D::SetConeOutsideVolume(const float _Volume, const bool _Deferred)
 {
 	if (!CheckCreated())
 	{
 		return false;
 	}
 
-	HRESULT _Result = DirectSound3DBuffer->SetConeOutsideVolume(DSBVOLUME_MIN + (LONG)((float)(DSBVOLUME_MAX - DSBVOLUME_MIN) * _Volume), DS3D_DEFERRED);
+	HRESULT _Result = DirectSound3DBuffer->SetConeOutsideVolume(DSBVOLUME_MIN + (LONG)((float)(DSBVOLUME_MAX - DSBVOLUME_MIN) * _Volume), _Deferred ? DS3D_DEFERRED : DS3D_IMMEDIATE);
+
+	if (_Result != S_OK)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+bool AuroraCore::Sound::Source3D::SetCurrentPosition(const size_t _CurrentPosition)
+{
+	if (!CheckCreated())
+	{
+		return false;
+	}
+
+	HRESULT _Result = DirectSoundBuffer->SetCurrentPosition(_CurrentPosition);
 
 	if (_Result != S_OK)
 	{
@@ -1267,11 +1327,37 @@ const bool AuroraCore::Sound::Source3D::GetConeOutsideVolume(float& _Volume) con
 	return true;
 }
 
+const bool AuroraCore::Sound::Source3D::GetCurrentPosition(size_t& _CurrentPosition) const
+{
+	if (!CheckCreated())
+	{
+		return false;
+	}
+
+	DWORD _AuxCurrentPosition = 0;
+
+	HRESULT _Result = DirectSoundBuffer->GetCurrentPosition(&_AuxCurrentPosition, nullptr);
+
+	if (_Result != S_OK)
+	{
+		return false;
+	}
+
+	_CurrentPosition = _AuxCurrentPosition;
+
+	return true;
+}
+
 bool AuroraCore::Sound::Source3D::Play(const bool _Looping)
 {
 	if (!CheckCreated())
 	{
 		return false;
+	}
+
+	if (Playing)
+	{
+		Stop();
 	}
 
 	HRESULT _Result = DirectSoundBuffer->Play(0, 0, _Looping ? DSBPLAY_LOOPING : NULL);

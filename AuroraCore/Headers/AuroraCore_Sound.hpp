@@ -44,9 +44,9 @@ namespace AuroraCore
 			void Destroy();
 
 			bool SetVolume(const float _Volume);
-			bool SetPosition(const Math::Vec3f& _Position);
-			bool SetOrientation(const Math::Vec3f& _Front, const Math::Vec3f& _Up);
-			bool SetVelocity(const Math::Vec3f& _Velocity);
+			bool SetPosition(const Math::Vec3f& _Position, const bool _Deferred = true);
+			bool SetOrientation(const Math::Vec3f& _Front, const Math::Vec3f& _Up, const bool _Deferred = true);
+			bool SetVelocity(const Math::Vec3f& _Velocity, const bool _Deferred = true);
 
 			const bool GetVolume(float& _Volume) const;
 			const bool GetPosition(Math::Vec3f& _Position) const;
@@ -146,9 +146,11 @@ namespace AuroraCore
 
 			bool SetVolume(const float _Volume);
 			bool SetFrequency(const float _Frequency);
+			bool SetCurrentPosition(const size_t _CurrentPosition);
 
 			const bool GetVolume(float& _Volume) const;
 			const bool GetFrequency(float& _Frequency) const;
+			const bool GetCurrentPosition(size_t& _CurrentPosition) const;
 
 			bool Play(const bool _Looping);
 			bool Stop();
@@ -183,13 +185,14 @@ namespace AuroraCore
 
 			bool SetVolume(const float _Volume);
 			bool SetFrequency(const float _Frequency);
-			bool SetPosition(const Math::Vec3f& _Position);
-			bool SetVelocity(const Math::Vec3f& _Velocity);
-			bool SetMinDistance(const float _Distance);
-			bool SetMaxDistance(const float _Distance);
-			bool SetConeAngles(const uint32_t _Inside, const uint32_t _Outside);
-			bool SetConeOrientation(const Math::Vec3f& _Orientation);
-			bool SetConeOutsideVolume(const float _Volume);
+			bool SetPosition(const Math::Vec3f& _Position, const bool _Deferred = true);
+			bool SetVelocity(const Math::Vec3f& _Velocity, const bool _Deferred = true);
+			bool SetMinDistance(const float _Distance, const bool _Deferred = true);
+			bool SetMaxDistance(const float _Distance, const bool _Deferred = true);
+			bool SetConeAngles(const uint32_t _Inside, const uint32_t _Outside, const bool _Deferred = true);
+			bool SetConeOrientation(const Math::Vec3f& _Orientation, const bool _Deferred = true);
+			bool SetConeOutsideVolume(const float _Volume, const bool _Deferred = true);
+			bool SetCurrentPosition(const size_t _CurrentPosition);
 
 			const bool GetVolume(float& _Volume) const;
 			const bool GetFrequency(float& _Frequency) const;
@@ -200,6 +203,7 @@ namespace AuroraCore
 			const bool GetConeAngles(uint32_t& _Inside, uint32_t& _Outside) const;
 			const bool GetConeOrientation(Math::Vec3f& _Orientation) const;
 			const bool GetConeOutsideVolume(float& _Volume) const;
+			const bool GetCurrentPosition(size_t& _CurrentPosition) const;
 
 			bool Play(const bool _Looping);
 			bool Stop();

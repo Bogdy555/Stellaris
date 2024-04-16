@@ -16,14 +16,20 @@ namespace AuroraCore
 
 		struct CPUBuffer
 		{
+
 			size_t Size = 0;
 			uint8_t* Data = nullptr;
 			WAVEFORMATEX AudioInfo = { 0 };
-		};
 
-		uint8_t* LoadAudioFile(const wchar_t* _Path, size_t& _Size, WAVEFORMATEX& _AudioInfo);
-		uint8_t* LoadAudioResource(const HINSTANCE _InstanceHandle, const uint32_t _ResourceId, size_t& _Size, WAVEFORMATEX& _AudioInfo);
-		bool SaveAudioFile(const wchar_t* _Path, const uint8_t* _Data, const size_t _Size, const WAVEFORMATEX& _AudioInfo);
+			static float GetTotalTime(const size_t _Size, const WAVEFORMATEX& _AudioInfo);
+			static size_t GetSecondIndex(const float _Second, const size_t _Size, const WAVEFORMATEX& _AudioInfo);
+			static float GetIndexSecond(const size_t _Index, const size_t _Size, const WAVEFORMATEX& _AudioInfo);
+
+			static uint8_t* LoadAudioFile(const wchar_t* _Path, size_t& _Size, WAVEFORMATEX& _AudioInfo);
+			static uint8_t* LoadAudioResource(const HINSTANCE _InstanceHandle, const uint32_t _ResourceId, size_t& _Size, WAVEFORMATEX& _AudioInfo);
+			static bool SaveAudioFile(const wchar_t* _Path, const uint8_t* _Data, const size_t _Size, const WAVEFORMATEX& _AudioInfo);
+
+		};
 
 		struct Device
 		{
@@ -98,6 +104,11 @@ namespace AuroraCore
 			bool Unlock(uint8_t* _Buff1, const size_t _BuffSize1, uint8_t* _Buff2, const size_t _BuffSize2);
 
 			const bool CheckCreated() const;
+			const float GetTotalTime() const;
+			const size_t GetSecondIndex(const float _Second) const;
+			const float GetIndexSecond(const size_t _Index) const;
+			const size_t GetSize() const;
+			const WAVEFORMATEX GetAudioInfo() const;
 
 			Buffer& operator= (const Buffer& _Other) = delete;
 			Buffer& operator= (Buffer&& _Other) noexcept;
@@ -107,6 +118,8 @@ namespace AuroraCore
 			friend Source;
 
 			IDirectSoundBuffer* DirectSoundBuffer;
+			size_t Size;
+			WAVEFORMATEX AudioInfo;
 
 		};
 
@@ -127,6 +140,11 @@ namespace AuroraCore
 			bool Unlock(uint8_t* _Buff1, const size_t _BuffSize1, uint8_t* _Buff2, const size_t _BuffSize2);
 
 			const bool CheckCreated() const;
+			const float GetTotalTime() const;
+			const size_t GetSecondIndex(const float _Second) const;
+			const float GetIndexSecond(const size_t _Index) const;
+			const size_t GetSize() const;
+			const WAVEFORMATEX GetAudioInfo() const;
 
 			Buffer3D& operator= (const Buffer3D& _Other) = delete;
 			Buffer3D& operator= (Buffer3D&& _Other) noexcept;
@@ -136,6 +154,8 @@ namespace AuroraCore
 			friend Source3D;
 
 			IDirectSoundBuffer* DirectSoundBuffer;
+			size_t Size;
+			WAVEFORMATEX AudioInfo;
 
 		};
 
@@ -166,6 +186,13 @@ namespace AuroraCore
 			const bool CheckCreated() const;
 			const bool IsPlaying() const;
 			const bool IsLooping() const;
+			const float GetTotalTime() const;
+			const size_t GetSecondIndex(const float _Second) const;
+			const float GetIndexSecond(const size_t _Index) const;
+			const float GetPlayTime() const;
+			const float GetStartTime() const;
+			const size_t GetSize() const;
+			const WAVEFORMATEX GetAudioInfo() const;
 
 			Source& operator= (const Source& _Other) = delete;
 			Source& operator= (Source&& _Other) noexcept;
@@ -175,6 +202,10 @@ namespace AuroraCore
 			IDirectSoundBuffer8* DirectSoundBuffer;
 			bool Playing;
 			bool Looping;
+			size_t Size;
+			WAVEFORMATEX AudioInfo;
+			Time::Timer PlayTime;
+			float StartTime;
 
 		};
 
@@ -219,6 +250,13 @@ namespace AuroraCore
 			const bool CheckCreated() const;
 			const bool IsPlaying() const;
 			const bool IsLooping() const;
+			const float GetTotalTime() const;
+			const size_t GetSecondIndex(const float _Second) const;
+			const float GetIndexSecond(const size_t _Index) const;
+			const float GetPlayTime() const;
+			const float GetStartTime() const;
+			const size_t GetSize() const;
+			const WAVEFORMATEX GetAudioInfo() const;
 
 			Source3D& operator= (const Source3D& _Other) = delete;
 			Source3D& operator= (Source3D&& _Other) noexcept;
@@ -229,6 +267,10 @@ namespace AuroraCore
 			IDirectSound3DBuffer8* DirectSound3DBuffer;
 			bool Playing;
 			bool Looping;
+			size_t Size;
+			WAVEFORMATEX AudioInfo;
+			Time::Timer PlayTime;
+			float StartTime;
 
 		};
 

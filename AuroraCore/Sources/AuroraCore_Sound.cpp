@@ -8,7 +8,64 @@ const std::vector<AuroraCore::Sound::Device>& AuroraCore::Sound::Devices = _Devi
 
 
 
-uint8_t* AuroraCore::Sound::LoadAudioFile(const wchar_t* _Path, size_t& _Size, WAVEFORMATEX& _AudioInfo)
+float AuroraCore::Sound::CPUBuffer::GetTotalTime(const size_t _Size, const WAVEFORMATEX& _AudioInfo)
+{
+	if ((_AudioInfo.nChannels != 1 && _AudioInfo.nChannels != 2) || (_AudioInfo.wBitsPerSample != 8 && _AudioInfo.wBitsPerSample != 16) || _AudioInfo.nAvgBytesPerSec == 0)
+	{
+		return 0.0f;
+	}
+
+	return (float)(_Size) / (float)(_AudioInfo.nAvgBytesPerSec);
+}
+
+size_t AuroraCore::Sound::CPUBuffer::GetSecondIndex(const float _Second, const size_t _Size, const WAVEFORMATEX& _AudioInfo)
+{
+	float _TotalTime = GetTotalTime(_Size, _AudioInfo);
+
+	if (_TotalTime == 0.0f)
+	{
+		return 0;
+	}
+
+	float _MappedSecond = _Second - _TotalTime * std::floor(_Second / _TotalTime);
+
+	size_t _Result = (size_t)(_MappedSecond / _TotalTime * (float)(_Size));
+
+	if (_AudioInfo.nChannels == 1)
+	{
+		if (_AudioInfo.wBitsPerSample == 16)
+		{
+			_Result -= _Result % 2;
+		}
+	}
+	if (_AudioInfo.nChannels == 2)
+	{
+		if (_AudioInfo.wBitsPerSample == 8)
+		{
+			_Result -= _Result % 2;
+		}
+		if (_AudioInfo.wBitsPerSample == 16)
+		{
+			_Result -= _Result % 4;
+		}
+	}
+
+	return _Result;
+}
+
+float AuroraCore::Sound::CPUBuffer::GetIndexSecond(const size_t _Index, const size_t _Size, const WAVEFORMATEX& _AudioInfo)
+{
+	float _TotalTime = GetTotalTime(_Size, _AudioInfo);
+
+	if (_TotalTime == 0.0f)
+	{
+		return 0.0f;
+	}
+
+	return _TotalTime * (float)(_Index % _Size) / (float)(_Size);
+}
+
+uint8_t* AuroraCore::Sound::CPUBuffer::LoadAudioFile(const wchar_t* _Path, size_t& _Size, WAVEFORMATEX& _AudioInfo)
 {
 	_Size = 0;
 	_AudioInfo = { 0 };
@@ -16,7 +73,7 @@ uint8_t* AuroraCore::Sound::LoadAudioFile(const wchar_t* _Path, size_t& _Size, W
 	return nullptr;
 }
 
-uint8_t* AuroraCore::Sound::LoadAudioResource(const HINSTANCE _InstanceHandle, const uint32_t _ResourceId, size_t& _Size, WAVEFORMATEX& _AudioInfo)
+uint8_t* AuroraCore::Sound::CPUBuffer::LoadAudioResource(const HINSTANCE _InstanceHandle, const uint32_t _ResourceId, size_t& _Size, WAVEFORMATEX& _AudioInfo)
 {
 	_Size = 0;
 	_AudioInfo = { 0 };
@@ -24,7 +81,7 @@ uint8_t* AuroraCore::Sound::LoadAudioResource(const HINSTANCE _InstanceHandle, c
 	return nullptr;
 }
 
-bool AuroraCore::Sound::SaveAudioFile(const wchar_t* _Path, const uint8_t* _Data, const size_t _Size, const WAVEFORMATEX& _AudioInfo)
+bool AuroraCore::Sound::CPUBuffer::SaveAudioFile(const wchar_t* _Path, const uint8_t* _Data, const size_t _Size, const WAVEFORMATEX& _AudioInfo)
 {
 	return false;
 }
@@ -418,14 +475,16 @@ AuroraCore::Sound::Context& AuroraCore::Sound::Context::operator= (Context&& _Ot
 
 
 
-AuroraCore::Sound::Buffer::Buffer() : DirectSoundBuffer(nullptr)
+AuroraCore::Sound::Buffer::Buffer() : DirectSoundBuffer(nullptr), Size(0), AudioInfo({0})
 {
 
 }
 
-AuroraCore::Sound::Buffer::Buffer(Buffer&& _Other) noexcept : DirectSoundBuffer(_Other.DirectSoundBuffer)
+AuroraCore::Sound::Buffer::Buffer(Buffer&& _Other) noexcept : DirectSoundBuffer(_Other.DirectSoundBuffer), Size(_Other.Size), AudioInfo(_Other.AudioInfo)
 {
 	_Other.DirectSoundBuffer = nullptr;
+	_Other.Size = 0;
+	_Other.AudioInfo = { 0 };
 }
 
 AuroraCore::Sound::Buffer::~Buffer()
@@ -492,12 +551,17 @@ bool AuroraCore::Sound::Buffer::Create(Context& _Context, const size_t _Size, co
 		}
 	}
 
+	Size = _Size;
+	AudioInfo = _AudioInfo;
+
 	return true;
 }
 
 void AuroraCore::Sound::Buffer::Destroy()
 {
 	AURORA_CORE_COM_RELEASE(DirectSoundBuffer);
+	Size = 0;
+	AudioInfo = { 0 };
 }
 
 bool AuroraCore::Sound::Buffer::Lock(const size_t _Offset, const size_t _Size, uint8_t** _Buff1, size_t& _BuffSize1, uint8_t** _Buff2, size_t& _BuffSize2)
@@ -545,27 +609,100 @@ const bool AuroraCore::Sound::Buffer::CheckCreated() const
 	return DirectSoundBuffer != nullptr;
 }
 
+const float AuroraCore::Sound::Buffer::GetTotalTime() const
+{
+	if (!CheckCreated() || (AudioInfo.nChannels != 1 && AudioInfo.nChannels != 2) || (AudioInfo.wBitsPerSample != 8 && AudioInfo.wBitsPerSample != 16) || AudioInfo.nAvgBytesPerSec == 0)
+	{
+		return 0.0f;
+	}
+
+	return (float)(Size) / (float)(AudioInfo.nAvgBytesPerSec);
+}
+
+const size_t AuroraCore::Sound::Buffer::GetSecondIndex(const float _Second) const
+{
+	float _TotalTime = GetTotalTime();
+
+	if (_TotalTime == 0.0f)
+	{
+		return 0;
+	}
+
+	float _MappedSecond = _Second - _TotalTime * std::floor(_Second / _TotalTime);
+
+	size_t _Result = (size_t)(_MappedSecond / _TotalTime * (float)(Size));
+
+	if (AudioInfo.nChannels == 1)
+	{
+		if (AudioInfo.wBitsPerSample == 16)
+		{
+			_Result -= _Result % 2;
+		}
+	}
+	if (AudioInfo.nChannels == 2)
+	{
+		if (AudioInfo.wBitsPerSample == 8)
+		{
+			_Result -= _Result % 2;
+		}
+		if (AudioInfo.wBitsPerSample == 16)
+		{
+			_Result -= _Result % 4;
+		}
+	}
+
+	return _Result;
+}
+
+const float AuroraCore::Sound::Buffer::GetIndexSecond(const size_t _Index) const
+{
+	float _TotalTime = GetTotalTime();
+
+	if (_TotalTime == 0.0f)
+	{
+		return 0.0f;
+	}
+
+	return _TotalTime * (float)(_Index % Size) / (float)(Size);
+}
+
+const size_t AuroraCore::Sound::Buffer::GetSize() const
+{
+	return Size;
+}
+
+const WAVEFORMATEX AuroraCore::Sound::Buffer::GetAudioInfo() const
+{
+	return AudioInfo;
+}
+
 AuroraCore::Sound::Buffer& AuroraCore::Sound::Buffer::operator= (Buffer&& _Other) noexcept
 {
 	AURORA_CORE_ASSERT_MSG(!CheckCreated(), AURORA_CORE_STRING_PREFIX("Can not take ownership of another sound buffer until this one is free!"));
 
 	DirectSoundBuffer = _Other.DirectSoundBuffer;
+	Size = _Other.Size;
+	AudioInfo = _Other.AudioInfo;
 
 	_Other.DirectSoundBuffer = nullptr;
+	_Other.Size = 0;
+	_Other.AudioInfo = { 0 };
 
 	return *this;
 }
 
 
 
-AuroraCore::Sound::Buffer3D::Buffer3D() : DirectSoundBuffer(nullptr)
+AuroraCore::Sound::Buffer3D::Buffer3D() : DirectSoundBuffer(nullptr), Size(0), AudioInfo({0})
 {
 
 }
 
-AuroraCore::Sound::Buffer3D::Buffer3D(Buffer3D&& _Other) noexcept : DirectSoundBuffer(_Other.DirectSoundBuffer)
+AuroraCore::Sound::Buffer3D::Buffer3D(Buffer3D&& _Other) noexcept : DirectSoundBuffer(_Other.DirectSoundBuffer), Size(_Other.Size), AudioInfo(_Other.AudioInfo)
 {
 	_Other.DirectSoundBuffer = nullptr;
+	_Other.Size = 0;
+	_Other.AudioInfo = { 0 };
 }
 
 AuroraCore::Sound::Buffer3D::~Buffer3D()
@@ -632,12 +769,17 @@ bool AuroraCore::Sound::Buffer3D::Create(Context& _Context, const size_t _Size, 
 		}
 	}
 
+	Size = _Size;
+	AudioInfo = _AudioInfo;
+
 	return true;
 }
 
 void AuroraCore::Sound::Buffer3D::Destroy()
 {
 	AURORA_CORE_COM_RELEASE(DirectSoundBuffer);
+	Size = 0;
+	AudioInfo = { 0 };
 }
 
 bool AuroraCore::Sound::Buffer3D::Lock(const size_t _Offset, const size_t _Size, uint8_t** _Buff1, size_t& _BuffSize1, uint8_t** _Buff2, size_t& _BuffSize2)
@@ -685,29 +827,103 @@ const bool AuroraCore::Sound::Buffer3D::CheckCreated() const
 	return DirectSoundBuffer != nullptr;
 }
 
+const float AuroraCore::Sound::Buffer3D::GetTotalTime() const
+{
+	if (!CheckCreated() || (AudioInfo.nChannels != 1 && AudioInfo.nChannels != 2) || (AudioInfo.wBitsPerSample != 8 && AudioInfo.wBitsPerSample != 16) || AudioInfo.nAvgBytesPerSec == 0)
+	{
+		return 0.0f;
+	}
+
+	return (float)(Size) / (float)(AudioInfo.nAvgBytesPerSec);
+}
+
+const size_t AuroraCore::Sound::Buffer3D::GetSecondIndex(const float _Second) const
+{
+	float _TotalTime = GetTotalTime();
+
+	if (_TotalTime == 0.0f)
+	{
+		return 0;
+	}
+
+	float _MappedSecond = _Second - _TotalTime * std::floor(_Second / _TotalTime);
+
+	size_t _Result = (size_t)(_MappedSecond / _TotalTime * (float)(Size));
+
+	if (AudioInfo.nChannels == 1)
+	{
+		if (AudioInfo.wBitsPerSample == 16)
+		{
+			_Result -= _Result % 2;
+		}
+	}
+	if (AudioInfo.nChannels == 2)
+	{
+		if (AudioInfo.wBitsPerSample == 8)
+		{
+			_Result -= _Result % 2;
+		}
+		if (AudioInfo.wBitsPerSample == 16)
+		{
+			_Result -= _Result % 4;
+		}
+	}
+
+	return _Result;
+}
+
+const float AuroraCore::Sound::Buffer3D::GetIndexSecond(const size_t _Index) const
+{
+	float _TotalTime = GetTotalTime();
+
+	if (_TotalTime == 0.0f)
+	{
+		return 0.0f;
+	}
+
+	return _TotalTime * (float)(_Index % Size) / (float)(Size);
+}
+
+const size_t AuroraCore::Sound::Buffer3D::GetSize() const
+{
+	return Size;
+}
+
+const WAVEFORMATEX AuroraCore::Sound::Buffer3D::GetAudioInfo() const
+{
+	return AudioInfo;
+}
+
 AuroraCore::Sound::Buffer3D& AuroraCore::Sound::Buffer3D::operator= (Buffer3D&& _Other) noexcept
 {
 	AURORA_CORE_ASSERT_MSG(!CheckCreated(), AURORA_CORE_STRING_PREFIX("Can not take ownership of another 3D sound buffer until this one is free!"));
 
 	DirectSoundBuffer = _Other.DirectSoundBuffer;
+	Size = _Other.Size;
+	AudioInfo = _Other.AudioInfo;
 
 	_Other.DirectSoundBuffer = nullptr;
+	_Other.Size = 0;
+	_Other.AudioInfo = { 0 };
 
 	return *this;
 }
 
 
 
-AuroraCore::Sound::Source::Source() : DirectSoundBuffer(nullptr), Playing(false), Looping(false)
+AuroraCore::Sound::Source::Source() : DirectSoundBuffer(nullptr), Playing(false), Looping(false), Size(0), AudioInfo({0}), PlayTime(), StartTime(0.0f)
 {
 
 }
 
-AuroraCore::Sound::Source::Source(Source&& _Other) noexcept : DirectSoundBuffer(_Other.DirectSoundBuffer), Playing(_Other.Playing), Looping(_Other.Looping)
+AuroraCore::Sound::Source::Source(Source&& _Other) noexcept : DirectSoundBuffer(_Other.DirectSoundBuffer), Playing(_Other.Playing), Looping(_Other.Looping), Size(_Other.Size), AudioInfo(_Other.AudioInfo), PlayTime(std::move(_Other.PlayTime)), StartTime(_Other.StartTime)
 {
 	_Other.DirectSoundBuffer = nullptr;
 	_Other.Playing = false;
 	_Other.Looping = false;
+	_Other.Size = 0;
+	_Other.AudioInfo = { 0 };
+	_Other.StartTime = 0.0f;
 }
 
 AuroraCore::Sound::Source::~Source()
@@ -743,6 +959,9 @@ bool AuroraCore::Sound::Source::Create(Context& _Context, Buffer& _Buffer)
 
 	AURORA_CORE_COM_RELEASE(_TempBuffer);
 
+	Size = _Buffer.GetSize();
+	AudioInfo = _Buffer.GetAudioInfo();
+
 	return true;
 }
 
@@ -751,6 +970,10 @@ void AuroraCore::Sound::Source::Destroy()
 	AURORA_CORE_COM_RELEASE(DirectSoundBuffer);
 	Playing = false;
 	Looping = false;
+	Size = 0;
+	AudioInfo = { 0 };
+	PlayTime.Reset();
+	StartTime = 0.0f;
 }
 
 bool AuroraCore::Sound::Source::SetVolume(const float _Volume)
@@ -927,6 +1150,83 @@ const bool AuroraCore::Sound::Source::IsLooping() const
 	return Looping;
 }
 
+const float AuroraCore::Sound::Source::GetTotalTime() const
+{
+	if (!CheckCreated() || (AudioInfo.nChannels != 1 && AudioInfo.nChannels != 2) || (AudioInfo.wBitsPerSample != 8 && AudioInfo.wBitsPerSample != 16) || AudioInfo.nAvgBytesPerSec == 0)
+	{
+		return 0.0f;
+	}
+
+	return (float)(Size) / (float)(AudioInfo.nAvgBytesPerSec);
+}
+
+const size_t AuroraCore::Sound::Source::GetSecondIndex(const float _Second) const
+{
+	float _TotalTime = GetTotalTime();
+
+	if (_TotalTime == 0.0f)
+	{
+		return 0;
+	}
+
+	float _MappedSecond = _Second - _TotalTime * std::floor(_Second / _TotalTime);
+
+	size_t _Result = (size_t)(_MappedSecond / _TotalTime * (float)(Size));
+
+	if (AudioInfo.nChannels == 1)
+	{
+		if (AudioInfo.wBitsPerSample == 16)
+		{
+			_Result -= _Result % 2;
+		}
+	}
+	if (AudioInfo.nChannels == 2)
+	{
+		if (AudioInfo.wBitsPerSample == 8)
+		{
+			_Result -= _Result % 2;
+		}
+		if (AudioInfo.wBitsPerSample == 16)
+		{
+			_Result -= _Result % 4;
+		}
+	}
+
+	return _Result;
+}
+
+const float AuroraCore::Sound::Source::GetIndexSecond(const size_t _Index) const
+{
+	float _TotalTime = GetTotalTime();
+
+	if (_TotalTime == 0.0f)
+	{
+		return 0.0f;
+	}
+
+	return _TotalTime * (float)(_Index % Size) / (float)(Size);
+}
+
+const float AuroraCore::Sound::Source::GetPlayTime() const
+{
+	return PlayTime;
+}
+
+const float AuroraCore::Sound::Source::GetStartTime() const
+{
+	return StartTime;
+}
+
+const size_t AuroraCore::Sound::Source::GetSize() const
+{
+	return Size;
+}
+
+const WAVEFORMATEX AuroraCore::Sound::Source::GetAudioInfo() const
+{
+	return AudioInfo;
+}
+
 AuroraCore::Sound::Source& AuroraCore::Sound::Source::operator= (Source&& _Other) noexcept
 {
 	AURORA_CORE_ASSERT_MSG(!CheckCreated(), AURORA_CORE_STRING_PREFIX("Can not take ownership of another sound source until this one is free!"));
@@ -934,27 +1234,37 @@ AuroraCore::Sound::Source& AuroraCore::Sound::Source::operator= (Source&& _Other
 	DirectSoundBuffer = _Other.DirectSoundBuffer;
 	Playing = _Other.Playing;
 	Looping = _Other.Looping;
+	Size = _Other.Size;
+	AudioInfo = _Other.AudioInfo;
+	PlayTime = std::move(_Other.PlayTime);
+	StartTime = _Other.StartTime;
 
 	_Other.DirectSoundBuffer = nullptr;
 	_Other.Playing = false;
 	_Other.Looping = false;
+	_Other.Size = 0;
+	_Other.AudioInfo = { 0 };
+	_Other.StartTime = 0.0f;
 
 	return *this;
 }
 
 
 
-AuroraCore::Sound::Source3D::Source3D() : DirectSoundBuffer(nullptr), DirectSound3DBuffer(nullptr), Playing(false), Looping(false)
+AuroraCore::Sound::Source3D::Source3D() : DirectSoundBuffer(nullptr), DirectSound3DBuffer(nullptr), Playing(false), Looping(false), Size(0), AudioInfo({0}), PlayTime(), StartTime(0.0f)
 {
 
 }
 
-AuroraCore::Sound::Source3D::Source3D(Source3D&& _Other) noexcept : DirectSoundBuffer(_Other.DirectSoundBuffer), DirectSound3DBuffer(_Other.DirectSound3DBuffer), Playing(_Other.Playing), Looping(_Other.Looping)
+AuroraCore::Sound::Source3D::Source3D(Source3D&& _Other) noexcept : DirectSoundBuffer(_Other.DirectSoundBuffer), DirectSound3DBuffer(_Other.DirectSound3DBuffer), Playing(_Other.Playing), Looping(_Other.Looping), Size(_Other.Size), AudioInfo(_Other.AudioInfo), PlayTime(std::move(_Other.PlayTime)), StartTime(_Other.StartTime)
 {
 	_Other.DirectSoundBuffer = nullptr;
 	_Other.DirectSound3DBuffer = nullptr;
 	_Other.Playing = false;
 	_Other.Looping = false;
+	_Other.Size = 0;
+	_Other.AudioInfo = { 0 };
+	_Other.StartTime = 0.0f;
 }
 
 AuroraCore::Sound::Source3D::~Source3D()
@@ -998,6 +1308,9 @@ bool AuroraCore::Sound::Source3D::Create(Context& _Context, Buffer3D& _Buffer)
 		return false;
 	}
 
+	Size = _Buffer.GetSize();
+	AudioInfo = _Buffer.GetAudioInfo();
+
 	return true;
 }
 
@@ -1007,6 +1320,10 @@ void AuroraCore::Sound::Source3D::Destroy()
 	AURORA_CORE_COM_RELEASE(DirectSoundBuffer);
 	Playing = false;
 	Looping = false;
+	Size = 0;
+	AudioInfo = { 0 };
+	PlayTime.Reset();
+	StartTime = 0.0f;
 }
 
 bool AuroraCore::Sound::Source3D::SetVolume(const float _Volume)
@@ -1457,6 +1774,83 @@ const bool AuroraCore::Sound::Source3D::IsLooping() const
 	return Looping;
 }
 
+const float AuroraCore::Sound::Source3D::GetTotalTime() const
+{
+	if (!CheckCreated() || (AudioInfo.nChannels != 1 && AudioInfo.nChannels != 2) || (AudioInfo.wBitsPerSample != 8 && AudioInfo.wBitsPerSample != 16) || AudioInfo.nAvgBytesPerSec == 0)
+	{
+		return 0.0f;
+	}
+
+	return (float)(Size) / (float)(AudioInfo.nAvgBytesPerSec);
+}
+
+const size_t AuroraCore::Sound::Source3D::GetSecondIndex(const float _Second) const
+{
+	float _TotalTime = GetTotalTime();
+
+	if (_TotalTime == 0.0f)
+	{
+		return 0;
+	}
+
+	float _MappedSecond = _Second - _TotalTime * std::floor(_Second / _TotalTime);
+
+	size_t _Result = (size_t)(_MappedSecond / _TotalTime * (float)(Size));
+
+	if (AudioInfo.nChannels == 1)
+	{
+		if (AudioInfo.wBitsPerSample == 16)
+		{
+			_Result -= _Result % 2;
+		}
+	}
+	if (AudioInfo.nChannels == 2)
+	{
+		if (AudioInfo.wBitsPerSample == 8)
+		{
+			_Result -= _Result % 2;
+		}
+		if (AudioInfo.wBitsPerSample == 16)
+		{
+			_Result -= _Result % 4;
+		}
+	}
+
+	return _Result;
+}
+
+const float AuroraCore::Sound::Source3D::GetIndexSecond(const size_t _Index) const
+{
+	float _TotalTime = GetTotalTime();
+
+	if (_TotalTime == 0.0f)
+	{
+		return 0.0f;
+	}
+
+	return _TotalTime * (float)(_Index % Size) / (float)(Size);
+}
+
+const float AuroraCore::Sound::Source3D::GetPlayTime() const
+{
+	return PlayTime;
+}
+
+const float AuroraCore::Sound::Source3D::GetStartTime() const
+{
+	return StartTime;
+}
+
+const size_t AuroraCore::Sound::Source3D::GetSize() const
+{
+	return Size;
+}
+
+const WAVEFORMATEX AuroraCore::Sound::Source3D::GetAudioInfo() const
+{
+	return AudioInfo;
+}
+
 AuroraCore::Sound::Source3D& AuroraCore::Sound::Source3D::operator= (Source3D&& _Other) noexcept
 {
 	AURORA_CORE_ASSERT_MSG(!CheckCreated(), AURORA_CORE_STRING_PREFIX("Can not take ownership of another sound 3D source until this one is free!"));
@@ -1465,11 +1859,18 @@ AuroraCore::Sound::Source3D& AuroraCore::Sound::Source3D::operator= (Source3D&& 
 	DirectSound3DBuffer = _Other.DirectSound3DBuffer;
 	Playing = _Other.Playing;
 	Looping = _Other.Looping;
+	Size = _Other.Size;
+	AudioInfo = _Other.AudioInfo;
+	PlayTime = std::move(_Other.PlayTime);
+	StartTime = _Other.StartTime;
 
 	_Other.DirectSoundBuffer = nullptr;
 	_Other.DirectSound3DBuffer = nullptr;
 	_Other.Playing = false;
 	_Other.Looping = false;
+	_Other.Size = 0;
+	_Other.AudioInfo = { 0 };
+	_Other.StartTime = 0.0f;
 
 	return *this;
 }

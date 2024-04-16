@@ -57,7 +57,7 @@ int WINAPI wWinMain(_In_ HINSTANCE _hInstance, _In_opt_ HINSTANCE _hPrevInstance
 	size_t _Size = 0;
 	WAVEFORMATEX _AudioInfo;
 
-	if (!LoadFile(L"C:\\Users\\Bogdan\\source\\repos\\DirectSound\\DirectSound\\Files\\Test.wav", &_Data, _Size, _AudioInfo))
+	if (!LoadFile(L"C:\\Users\\Bogdan\\source\\repos\\Test.wav", &_Data, _Size, _AudioInfo))
 	{
 		return -1;
 	}

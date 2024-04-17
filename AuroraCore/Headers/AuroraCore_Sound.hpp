@@ -182,6 +182,7 @@ namespace AuroraCore
 
 			bool Play(const bool _Looping);
 			bool Stop();
+			void UpdatePlayTime();
 
 			const bool CheckCreated() const;
 			const bool IsPlaying() const;
@@ -246,6 +247,7 @@ namespace AuroraCore
 
 			bool Play(const bool _Looping);
 			bool Stop();
+			void UpdatePlayTime();
 
 			const bool CheckCreated() const;
 			const bool IsPlaying() const;

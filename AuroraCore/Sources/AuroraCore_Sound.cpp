@@ -1017,11 +1017,29 @@ bool AuroraCore::Sound::Source::SetCurrentPosition(const size_t _CurrentPosition
 		return false;
 	}
 
+	bool _Playing = Playing;
+	bool _Looping = Looping;
+
+	if (Playing)
+	{
+		Stop();
+	}
+
+	StartTime = GetIndexSecond(_CurrentPosition);
+
 	HRESULT _Result = DirectSoundBuffer->SetCurrentPosition((DWORD)(_CurrentPosition));
 
 	if (_Result != S_OK)
 	{
 		return false;
+	}
+
+	if (_Playing)
+	{
+		if (!Play(_Looping))
+		{
+			return false;
+		}
 	}
 
 	return true;
@@ -1111,6 +1129,7 @@ bool AuroraCore::Sound::Source::Play(const bool _Looping)
 
 	Playing = true;
 	Looping = _Looping;
+	PlayTime.Reset();
 
 	return true;
 }
@@ -1124,6 +1143,8 @@ bool AuroraCore::Sound::Source::Stop()
 
 	Playing = false;
 	Looping = false;
+	PlayTime.Reset();
+	StartTime = 0.0f;
 
 	HRESULT _Result = DirectSoundBuffer->Stop();
 
@@ -1133,6 +1154,28 @@ bool AuroraCore::Sound::Source::Stop()
 	}
 
 	return true;
+}
+
+void AuroraCore::Sound::Source::UpdatePlayTime()
+{
+	if (Playing)
+	{
+		if (Looping)
+		{
+			PlayTime.Stop();
+		}
+		else
+		{
+			PlayTime.Stop();
+
+			if (StartTime + PlayTime >= GetTotalTime())
+			{
+				Playing = false;
+				PlayTime.Reset();
+				StartTime = 0.0f;
+			}
+		}
+	}
 }
 
 const bool AuroraCore::Sound::Source::CheckCreated() const
@@ -1486,11 +1529,29 @@ bool AuroraCore::Sound::Source3D::SetCurrentPosition(const size_t _CurrentPositi
 		return false;
 	}
 
+	bool _Playing = Playing;
+	bool _Looping = Looping;
+
+	if (Playing)
+	{
+		Stop();
+	}
+
+	StartTime = GetIndexSecond(_CurrentPosition);
+
 	HRESULT _Result = DirectSoundBuffer->SetCurrentPosition((DWORD)(_CurrentPosition));
 
 	if (_Result != S_OK)
 	{
 		return false;
+	}
+
+	if (_Playing)
+	{
+		if (!Play(_Looping))
+		{
+			return false;
+		}
 	}
 
 	return true;
@@ -1735,6 +1796,7 @@ bool AuroraCore::Sound::Source3D::Play(const bool _Looping)
 
 	Playing = true;
 	Looping = _Looping;
+	PlayTime.Reset();
 
 	return true;
 }
@@ -1748,6 +1810,8 @@ bool AuroraCore::Sound::Source3D::Stop()
 
 	Playing = false;
 	Looping = false;
+	PlayTime.Reset();
+	StartTime = 0.0f;
 
 	HRESULT _Result = DirectSoundBuffer->Stop();
 
@@ -1757,6 +1821,28 @@ bool AuroraCore::Sound::Source3D::Stop()
 	}
 
 	return true;
+}
+
+void AuroraCore::Sound::Source3D::UpdatePlayTime()
+{
+	if (Playing)
+	{
+		if (Looping)
+		{
+			PlayTime.Stop();
+		}
+		else
+		{
+			PlayTime.Stop();
+
+			if (StartTime + PlayTime >= GetTotalTime())
+			{
+				Playing = false;
+				PlayTime.Reset();
+				StartTime = 0.0f;
+			}
+		}
+	}
 }
 
 const bool AuroraCore::Sound::Source3D::CheckCreated() const

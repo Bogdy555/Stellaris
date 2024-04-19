@@ -70,7 +70,293 @@ uint8_t* AuroraCore::Sound::CPUBuffer::LoadAudioFile(const wchar_t* _Path, size_
 	_Size = 0;
 	_AudioInfo = { 0 };
 
-	return nullptr;
+	if (!_Path)
+	{
+		return nullptr;
+	}
+
+	FILE* _File = nullptr;
+
+	_wfopen_s(&_File, _Path, L"rb");
+
+	if (!_File)
+	{
+		return nullptr;
+	}
+
+	{
+		char _MagicNumbers[5];
+
+		if (fread(_MagicNumbers, 1, 4, _File) != 4)
+		{
+			_Size = 0;
+			_AudioInfo = { 0 };
+			fclose(_File);
+			return nullptr;
+		}
+
+		_MagicNumbers[4] = '\0';
+
+		if (strcmp(_MagicNumbers, "RIFF") != 0)
+		{
+			_Size = 0;
+			_AudioInfo = { 0 };
+			fclose(_File);
+			return nullptr;
+		}
+	}
+
+	{
+		if (fseek(_File, 0, SEEK_END) != 0)
+		{
+			_Size = 0;
+			_AudioInfo = { 0 };
+			fclose(_File);
+			return nullptr;
+		}
+
+		int32_t _TotalFileSize = ftell(_File) - 8;
+
+		if (_TotalFileSize == -9)
+		{
+			_Size = 0;
+			_AudioInfo = { 0 };
+			fclose(_File);
+			return nullptr;
+		}
+
+		if (fseek(_File, 4, SEEK_SET) != 0)
+		{
+			_Size = 0;
+			_AudioInfo = { 0 };
+			fclose(_File);
+			return nullptr;
+		}
+
+		int32_t _ReadFileSize = 0;
+
+		if (fread(&_ReadFileSize, 4, 1, _File) != 1)
+		{
+			_Size = 0;
+			_AudioInfo = { 0 };
+			fclose(_File);
+			return nullptr;
+		}
+
+		if (_ReadFileSize != _TotalFileSize)
+		{
+			_Size = 0;
+			_AudioInfo = { 0 };
+			fclose(_File);
+			return nullptr;
+		}
+	}
+
+	{
+		char _MagicNumbers[9];
+
+		if (fread(_MagicNumbers, 1, 8, _File) != 8)
+		{
+			_Size = 0;
+			_AudioInfo = { 0 };
+			fclose(_File);
+			return nullptr;
+		}
+
+		_MagicNumbers[8] = '\0';
+
+		if (strcmp(_MagicNumbers, "WAVEfmt ") != 0)
+		{
+			_Size = 0;
+			_AudioInfo = { 0 };
+			fclose(_File);
+			return nullptr;
+		}
+	}
+
+	{
+		uint32_t _SubChunkSize = 0;
+
+		if (fread(&_SubChunkSize, 4, 1, _File) != 1)
+		{
+			_Size = 0;
+			_AudioInfo = { 0 };
+			fclose(_File);
+			return nullptr;
+		}
+
+		if (_SubChunkSize != 16)
+		{
+			_Size = 0;
+			_AudioInfo = { 0 };
+			fclose(_File);
+			return nullptr;
+		}
+	}
+
+	if (fread(&_AudioInfo.wFormatTag, 2, 1, _File) != 1)
+	{
+		_Size = 0;
+		_AudioInfo = { 0 };
+		fclose(_File);
+		return nullptr;
+	}
+
+	if (_AudioInfo.wFormatTag != 1)
+	{
+		_Size = 0;
+		_AudioInfo = { 0 };
+		fclose(_File);
+		return nullptr;
+	}
+
+	if (fread(&_AudioInfo.nChannels, 2, 1, _File) != 1)
+	{
+		_Size = 0;
+		_AudioInfo = { 0 };
+		fclose(_File);
+		return nullptr;
+	}
+
+	if (_AudioInfo.nChannels != 1 && _AudioInfo.nChannels != 2)
+	{
+		_Size = 0;
+		_AudioInfo = { 0 };
+		fclose(_File);
+		return nullptr;
+	}
+
+	if (fread(&_AudioInfo.nSamplesPerSec, 4, 1, _File) != 1)
+	{
+		_Size = 0;
+		_AudioInfo = { 0 };
+		fclose(_File);
+		return nullptr;
+	}
+
+	if (_AudioInfo.nSamplesPerSec == 0)
+	{
+		_Size = 0;
+		_AudioInfo = { 0 };
+		fclose(_File);
+		return nullptr;
+	}
+
+	if (fread(&_AudioInfo.nAvgBytesPerSec, 4, 1, _File) != 1)
+	{
+		_Size = 0;
+		_AudioInfo = { 0 };
+		fclose(_File);
+		return nullptr;
+	}
+
+	if (_AudioInfo.nAvgBytesPerSec == 0)
+	{
+		_Size = 0;
+		_AudioInfo = { 0 };
+		fclose(_File);
+		return nullptr;
+	}
+
+	if (fread(&_AudioInfo.nBlockAlign, 2, 1, _File) != 1)
+	{
+		_Size = 0;
+		_AudioInfo = { 0 };
+		fclose(_File);
+		return nullptr;
+	}
+
+	if (_AudioInfo.nBlockAlign == 0)
+	{
+		_Size = 0;
+		_AudioInfo = { 0 };
+		fclose(_File);
+		return nullptr;
+	}
+
+	if (fread(&_AudioInfo.wBitsPerSample, 2, 1, _File) != 1)
+	{
+		_Size = 0;
+		_AudioInfo = { 0 };
+		fclose(_File);
+		return nullptr;
+	}
+
+	if (_AudioInfo.wBitsPerSample != 8 && _AudioInfo.wBitsPerSample != 16)
+	{
+		_Size = 0;
+		_AudioInfo = { 0 };
+		fclose(_File);
+		return nullptr;
+	}
+
+	{
+		char _MagicNumbers[5];
+
+		if (fread(_MagicNumbers, 1, 4, _File) != 4)
+		{
+			_Size = 0;
+			_AudioInfo = { 0 };
+			fclose(_File);
+			return nullptr;
+		}
+
+		_MagicNumbers[4] = '\0';
+
+		if (strcmp(_MagicNumbers, "data") != 0)
+		{
+			_Size = 0;
+			_AudioInfo = { 0 };
+			fclose(_File);
+			return nullptr;
+		}
+	}
+
+	{
+		uint32_t _BufferSize = 0;
+
+		if (fread(&_BufferSize, 4, 1, _File) != 1)
+		{
+			_Size = 0;
+			_AudioInfo = { 0 };
+			fclose(_File);
+			return nullptr;
+		}
+
+		/*
+		if (_BufferSize == )
+		{
+			_Size = 0;
+			_AudioInfo = { 0 };
+			fclose(_File);
+			return nullptr;
+		}
+		*/
+
+		_Size = _BufferSize;
+	}
+
+	uint8_t* _Data = new uint8_t[_Size];
+
+	if (_Data == nullptr)
+	{
+		_Size = 0;
+		_AudioInfo = { 0 };
+		fclose(_File);
+		return nullptr;
+	}
+
+	if (fread(_Data, 1, _Size, _File) != _Size)
+	{
+		_Size = 0;
+		_AudioInfo = { 0 };
+		fclose(_File);
+		return nullptr;
+	}
+
+	fclose(_File);
+
+	return _Data;
 }
 
 uint8_t* AuroraCore::Sound::CPUBuffer::LoadAudioResource(const HINSTANCE _InstanceHandle, const uint32_t _ResourceId, size_t& _Size, WAVEFORMATEX& _AudioInfo)
@@ -83,7 +369,138 @@ uint8_t* AuroraCore::Sound::CPUBuffer::LoadAudioResource(const HINSTANCE _Instan
 
 bool AuroraCore::Sound::CPUBuffer::SaveAudioFile(const wchar_t* _Path, const uint8_t* _Data, const size_t _Size, const WAVEFORMATEX& _AudioInfo)
 {
-	return false;
+	if (!_Path)
+	{
+		return false;
+	}
+
+	if (!_Data || !_Size)
+	{
+		return false;
+	}
+
+	FILE* _File = nullptr;
+
+	_wfopen_s(&_File, _Path, L"wb");
+
+	if (!_File)
+	{
+		return false;
+	}
+
+	if (fwrite("RIFF    WAVEfmt ", 1, 16, _File) != 16)
+	{
+		fclose(_File);
+		_wremove(_Path);
+		return false;
+	}
+
+	{
+		uint32_t _SubChunkSize = 16;
+
+		if (fwrite(&_SubChunkSize, 4, 1, _File) != 1)
+		{
+			fclose(_File);
+			_wremove(_Path);
+			return false;
+		}
+	}
+
+	if (fwrite(&_AudioInfo.wFormatTag, 2, 1, _File) != 1)
+	{
+		fclose(_File);
+		_wremove(_Path);
+		return false;
+	}
+
+	if (fwrite(&_AudioInfo.nChannels, 2, 1, _File) != 1)
+	{
+		fclose(_File);
+		_wremove(_Path);
+		return false;
+	}
+
+	if (fwrite(&_AudioInfo.nSamplesPerSec, 4, 1, _File) != 1)
+	{
+		fclose(_File);
+		_wremove(_Path);
+		return false;
+	}
+
+	if (fwrite(&_AudioInfo.nAvgBytesPerSec, 4, 1, _File) != 1)
+	{
+		fclose(_File);
+		_wremove(_Path);
+		return false;
+	}
+
+	if (fwrite(&_AudioInfo.nBlockAlign, 2, 1, _File) != 1)
+	{
+		fclose(_File);
+		_wremove(_Path);
+		return false;
+	}
+
+	if (fwrite(&_AudioInfo.wBitsPerSample, 2, 1, _File) != 1)
+	{
+		fclose(_File);
+		_wremove(_Path);
+		return false;
+	}
+
+	if (fwrite("data", 1, 4, _File) != 4)
+	{
+		fclose(_File);
+		_wremove(_Path);
+		return false;
+	}
+
+	{
+		uint32_t _BufferSize = _Size;
+
+		if (fwrite(&_BufferSize, 4, 1, _File) != 1)
+		{
+			fclose(_File);
+			_wremove(_Path);
+			return false;
+		}
+	}
+
+	if (fwrite(_Data, 1, _Size, _File) != _Size)
+	{
+		fclose(_File);
+		_wremove(_Path);
+		return false;
+	}
+
+	{
+		int32_t _FileSize = ftell(_File) - 8;
+
+		if (_FileSize == -9)
+		{
+			fclose(_File);
+			_wremove(_Path);
+			return false;
+		}
+
+		if (fseek(_File, 4, SEEK_SET) != 0)
+		{
+			fclose(_File);
+			_wremove(_Path);
+			return false;
+		}
+
+		if (fwrite(&_FileSize, 4, 1, _File) != 1)
+		{
+			fclose(_File);
+			_wremove(_Path);
+			return false;
+		}
+	}
+
+	fclose(_File);
+
+	return true;
 }
 
 

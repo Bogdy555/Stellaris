@@ -407,22 +407,79 @@ bool AuroraCore::Graphics::Assets::Image::Create(const size_t _Width, const size
 bool AuroraCore::Graphics::Assets::Image::Load(const wchar_t* _Path)
 {
 	Destroy();
-	HBITMAP _HBitMap = (HBITMAP)(LoadImage(NULL, _Path, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE));
+	HBITMAP _HBitMap = (HBITMAP)(LoadImage(NULL, _Path, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE));
 
 	BITMAP _BitMap = { 0 };
 
 	GetObject(_HBitMap, sizeof(BITMAP), &_BitMap);
 
+	Width = _BitMap.bmWidth;
+	Height = _BitMap.bmHeight;
+	ChannelsCount = 4;
+	Data = new uint8_t[Width * Height * ChannelsCount];
+
+	GetBitmapBits(_HBitMap, Width * Height * ChannelsCount, Data);
+
+	for (size_t index = 0; index < Width * Height; index++)
+	{
+		std::swap(Data[(index * ChannelsCount) + 0], Data[(index * ChannelsCount) + 2]);
+	}
+
+	for (size_t y = 0; y < Height / 2; y++)
+	{
+		for (size_t x = 0; x < Width; x++)
+		{
+			std::swap(Data[(x + y * Width) * ChannelsCount + 0], Data[(x + (Height - y - 1) * Width) * ChannelsCount + 0]);
+			std::swap(Data[(x + y * Width) * ChannelsCount + 1], Data[(x + (Height - y - 1) * Width) * ChannelsCount + 1]);
+			std::swap(Data[(x + y * Width) * ChannelsCount + 2], Data[(x + (Height - y - 1) * Width) * ChannelsCount + 2]);
+			std::swap(Data[(x + y * Width) * ChannelsCount + 3], Data[(x + (Height - y - 1) * Width) * ChannelsCount + 3]);
+		}
+	}
+
 	DeleteObject(_HBitMap);
 
-	return false;
+	return true;
 }
 
 const bool AuroraCore::Graphics::Assets::Image::Save(const wchar_t* _Path) const
 {
 
-	return false;
+	uint8_t* NewData;
+	NewData = new uint8_t[Width * Height * ChannelsCount];
 
+	for (size_t y = 0; y < Height; y++)
+	{
+		for (size_t x = 0; x < Width; x++)
+		{
+			NewData[(x + y * Width) * ChannelsCount + 0] = Data[(x + y * Width) * ChannelsCount + 2];
+			NewData[(x + y * Width) * ChannelsCount + 1] = Data[(x + y * Width) * ChannelsCount + 1];
+			NewData[(x + y * Width) * ChannelsCount + 2] = Data[(x + y * Width) * ChannelsCount + 0];
+			NewData[(x + y * Width) * ChannelsCount + 3] = Data[(x + y * Width) * ChannelsCount + 3];
+		}
+	}
+
+	FILE* File = nullptr;
+	_wfopen_s(&File, _Path, L"wb");
+
+	fwrite("BM", 1, 2, File);
+
+	uint32_t size = Width * Height * ChannelsCount + 54;
+	fwrite(&size, 4, 1, File);
+	
+	fwrite("\0\0\0\0\x36\0\0\0\x28\0\0\0", 1, 12, File);
+
+	uint32_t widthAux = Width;
+	fwrite(&widthAux, 4, 1, File);
+
+	uint32_t heightAux = Height;
+	fwrite(&heightAux, 4, 1, File);
+	fwrite("\x01\0\x20\0\0\0\0\0\0\0\0\0\x13\x0B\0\0\x13\x0B\0\0\0\0\0\0\0\0\0\0", 1, 28, File);
+
+	fwrite(NewData, 1, Width * Height * ChannelsCount, File);
+
+	fclose(File);
+
+	return true;
 }
 
 void AuroraCore::Graphics::Assets::Image::Destroy()

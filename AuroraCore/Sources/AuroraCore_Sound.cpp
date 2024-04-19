@@ -323,17 +323,39 @@ uint8_t* AuroraCore::Sound::CPUBuffer::LoadAudioFile(const wchar_t* _Path, size_
 			return nullptr;
 		}
 
-		/*
-		if (_BufferSize == )
+		if (_BufferSize == 0)
 		{
 			_Size = 0;
 			_AudioInfo = { 0 };
 			fclose(_File);
 			return nullptr;
 		}
-		*/
 
 		_Size = _BufferSize;
+	}
+
+	if (_AudioInfo.wBitsPerSample == 16 && _Size % 2 == 1)
+	{
+		_Size = 0;
+		_AudioInfo = { 0 };
+		fclose(_File);
+		return nullptr;
+	}
+
+	if (_AudioInfo.nBlockAlign != _AudioInfo.nChannels * _AudioInfo.wBitsPerSample / 8)
+	{
+		_Size = 0;
+		_AudioInfo = { 0 };
+		fclose(_File);
+		return nullptr;
+	}
+
+	if (_AudioInfo.nAvgBytesPerSec != _AudioInfo.nSamplesPerSec * _AudioInfo.nChannels * _AudioInfo.wBitsPerSample / 8)
+	{
+		_Size = 0;
+		_AudioInfo = { 0 };
+		fclose(_File);
+		return nullptr;
 	}
 
 	uint8_t* _Data = new uint8_t[_Size];
@@ -348,6 +370,30 @@ uint8_t* AuroraCore::Sound::CPUBuffer::LoadAudioFile(const wchar_t* _Path, size_
 
 	if (fread(_Data, 1, _Size, _File) != _Size)
 	{
+		delete[] _Data;
+		_Size = 0;
+		_AudioInfo = { 0 };
+		fclose(_File);
+		return nullptr;
+	}
+
+#ifdef AURORA_CORE_BIG_ENDIAN
+
+	if (_AudioInfo.wBitsPerSample == 16)
+	{
+		for (size_t _Index = 0; _Index < _Size / 2; _Index++)
+		{
+			uint8_t _Aux = _Data[_Index * 2 + 0];
+			_Data[_Index * 2 + 0] = _Data[_Index * 2 + 1];
+			_Data[_Index * 2 + 1] = _Aux;
+		}
+	}
+
+#endif
+
+	if (fgetc(_File) != EOF)
+	{
+		delete[] _Data;
 		_Size = 0;
 		_AudioInfo = { 0 };
 		fclose(_File);

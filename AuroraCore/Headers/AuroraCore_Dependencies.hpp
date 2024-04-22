@@ -28,6 +28,12 @@
 namespace AuroraCore
 {
 
+	enum States : const size_t
+	{
+		_Previous = 0,
+		_Current = 1
+	};
+
 	namespace Time
 	{
 
@@ -57,7 +63,11 @@ namespace AuroraCore
 	namespace RunTime
 	{
 
+		class Application;
 
+		enum MenuTypes : const uint64_t;
+
+		class Menu;
 
 	}
 

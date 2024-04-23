@@ -19,15 +19,15 @@ namespace AuroraCore
 
 			size_t Size = 0;
 			uint8_t* Data = nullptr;
-			WAVEFORMATEX AudioInfo = { 0 };
+			WAVEFORMATEX SoundInfo = { 0 };
 
-			static float GetTotalTime(const size_t _Size, const WAVEFORMATEX& _AudioInfo);
-			static size_t GetSecondIndex(const float _Second, const size_t _Size, const WAVEFORMATEX& _AudioInfo);
-			static float GetIndexSecond(const size_t _Index, const size_t _Size, const WAVEFORMATEX& _AudioInfo);
+			static float GetTotalTime(const size_t _Size, const WAVEFORMATEX& _SoundInfo);
+			static size_t GetSecondIndex(const float _Second, const size_t _Size, const WAVEFORMATEX& _SoundInfo);
+			static float GetIndexSecond(const size_t _Index, const size_t _Size, const WAVEFORMATEX& _SoundInfo);
 
-			static uint8_t* LoadAudioFile(const wchar_t* _Path, size_t& _Size, WAVEFORMATEX& _AudioInfo);
-			static uint8_t* LoadAudioResource(const HINSTANCE _InstanceHandle, const uint32_t _ResourceId, size_t& _Size, WAVEFORMATEX& _AudioInfo);
-			static bool SaveAudioFile(const wchar_t* _Path, const uint8_t* _Data, const size_t _Size, const WAVEFORMATEX& _AudioInfo);
+			static uint8_t* LoadSoundFile(const wchar_t* _Path, size_t& _Size, WAVEFORMATEX& _SoundInfo);
+			static uint8_t* LoadSoundResource(const HINSTANCE _InstanceHandle, const uint32_t _ResourceId, size_t& _Size, WAVEFORMATEX& _SoundInfo);
+			static bool SaveSoundFile(const wchar_t* _Path, const uint8_t* _Data, const size_t _Size, const WAVEFORMATEX& _SoundInfo);
 
 		};
 
@@ -97,7 +97,7 @@ namespace AuroraCore
 			Buffer(Buffer&& _Other) noexcept;
 			~Buffer();
 
-			bool Create(Context& _Context, const size_t _Size, const WAVEFORMATEX& _AudioInfo, const uint8_t* _Data);
+			bool Create(Context& _Context, const size_t _Size, const WAVEFORMATEX& _SoundInfo, const uint8_t* _Data);
 			void Destroy();
 
 			bool Lock(const size_t _Offset, const size_t _Size, uint8_t** _Buff1, size_t& _BuffSize1, uint8_t** _Buff2, size_t& _BuffSize2);
@@ -108,7 +108,7 @@ namespace AuroraCore
 			const size_t GetSecondIndex(const float _Second) const;
 			const float GetIndexSecond(const size_t _Index) const;
 			const size_t GetSize() const;
-			const WAVEFORMATEX GetAudioInfo() const;
+			const WAVEFORMATEX GetSoundInfo() const;
 
 			Buffer& operator= (const Buffer& _Other) = delete;
 			Buffer& operator= (Buffer&& _Other) noexcept;
@@ -119,7 +119,7 @@ namespace AuroraCore
 
 			IDirectSoundBuffer* DirectSoundBuffer;
 			size_t Size;
-			WAVEFORMATEX AudioInfo;
+			WAVEFORMATEX SoundInfo;
 
 		};
 
@@ -133,7 +133,7 @@ namespace AuroraCore
 			Buffer3D(Buffer3D&& _Other) noexcept;
 			~Buffer3D();
 
-			bool Create(Context& _Context, const size_t _Size, const WAVEFORMATEX& _AudioInfo, const uint8_t* _Data);
+			bool Create(Context& _Context, const size_t _Size, const WAVEFORMATEX& _SoundInfo, const uint8_t* _Data);
 			void Destroy();
 
 			bool Lock(const size_t _Offset, const size_t _Size, uint8_t** _Buff1, size_t& _BuffSize1, uint8_t** _Buff2, size_t& _BuffSize2);
@@ -144,7 +144,7 @@ namespace AuroraCore
 			const size_t GetSecondIndex(const float _Second) const;
 			const float GetIndexSecond(const size_t _Index) const;
 			const size_t GetSize() const;
-			const WAVEFORMATEX GetAudioInfo() const;
+			const WAVEFORMATEX GetSoundInfo() const;
 
 			Buffer3D& operator= (const Buffer3D& _Other) = delete;
 			Buffer3D& operator= (Buffer3D&& _Other) noexcept;
@@ -155,7 +155,7 @@ namespace AuroraCore
 
 			IDirectSoundBuffer* DirectSoundBuffer;
 			size_t Size;
-			WAVEFORMATEX AudioInfo;
+			WAVEFORMATEX SoundInfo;
 
 		};
 
@@ -193,7 +193,7 @@ namespace AuroraCore
 			const float GetPlayTime() const;
 			const float GetStartTime() const;
 			const size_t GetSize() const;
-			const WAVEFORMATEX GetAudioInfo() const;
+			const WAVEFORMATEX GetSoundInfo() const;
 
 			Source& operator= (const Source& _Other) = delete;
 			Source& operator= (Source&& _Other) noexcept;
@@ -204,7 +204,7 @@ namespace AuroraCore
 			bool Playing;
 			bool Looping;
 			size_t Size;
-			WAVEFORMATEX AudioInfo;
+			WAVEFORMATEX SoundInfo;
 			Time::Timer PlayTime;
 			float StartTime;
 
@@ -258,7 +258,7 @@ namespace AuroraCore
 			const float GetPlayTime() const;
 			const float GetStartTime() const;
 			const size_t GetSize() const;
-			const WAVEFORMATEX GetAudioInfo() const;
+			const WAVEFORMATEX GetSoundInfo() const;
 
 			Source3D& operator= (const Source3D& _Other) = delete;
 			Source3D& operator= (Source3D&& _Other) noexcept;
@@ -270,7 +270,7 @@ namespace AuroraCore
 			bool Playing;
 			bool Looping;
 			size_t Size;
-			WAVEFORMATEX AudioInfo;
+			WAVEFORMATEX SoundInfo;
 			Time::Timer PlayTime;
 			float StartTime;
 

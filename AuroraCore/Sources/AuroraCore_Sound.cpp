@@ -8,19 +8,19 @@ const std::vector<AuroraCore::Sound::Device>& AuroraCore::Sound::Devices = _Devi
 
 
 
-float AuroraCore::Sound::CPUBuffer::GetTotalTime(const size_t _Size, const WAVEFORMATEX& _AudioInfo)
+float AuroraCore::Sound::CPUBuffer::GetTotalTime(const size_t _Size, const WAVEFORMATEX& _SoundInfo)
 {
-	if ((_AudioInfo.nChannels != 1 && _AudioInfo.nChannels != 2) || (_AudioInfo.wBitsPerSample != 8 && _AudioInfo.wBitsPerSample != 16) || _AudioInfo.nAvgBytesPerSec == 0)
+	if ((_SoundInfo.nChannels != 1 && _SoundInfo.nChannels != 2) || (_SoundInfo.wBitsPerSample != 8 && _SoundInfo.wBitsPerSample != 16) || _SoundInfo.nAvgBytesPerSec == 0)
 	{
 		return 0.0f;
 	}
 
-	return (float)(_Size) / (float)(_AudioInfo.nAvgBytesPerSec);
+	return (float)(_Size) / (float)(_SoundInfo.nAvgBytesPerSec);
 }
 
-size_t AuroraCore::Sound::CPUBuffer::GetSecondIndex(const float _Second, const size_t _Size, const WAVEFORMATEX& _AudioInfo)
+size_t AuroraCore::Sound::CPUBuffer::GetSecondIndex(const float _Second, const size_t _Size, const WAVEFORMATEX& _SoundInfo)
 {
-	float _TotalTime = GetTotalTime(_Size, _AudioInfo);
+	float _TotalTime = GetTotalTime(_Size, _SoundInfo);
 
 	if (_TotalTime == 0.0f)
 	{
@@ -31,20 +31,20 @@ size_t AuroraCore::Sound::CPUBuffer::GetSecondIndex(const float _Second, const s
 
 	size_t _Result = (size_t)(_MappedSecond / _TotalTime * (float)(_Size));
 
-	if (_AudioInfo.nChannels == 1)
+	if (_SoundInfo.nChannels == 1)
 	{
-		if (_AudioInfo.wBitsPerSample == 16)
+		if (_SoundInfo.wBitsPerSample == 16)
 		{
 			_Result -= _Result % 2;
 		}
 	}
-	if (_AudioInfo.nChannels == 2)
+	if (_SoundInfo.nChannels == 2)
 	{
-		if (_AudioInfo.wBitsPerSample == 8)
+		if (_SoundInfo.wBitsPerSample == 8)
 		{
 			_Result -= _Result % 2;
 		}
-		if (_AudioInfo.wBitsPerSample == 16)
+		if (_SoundInfo.wBitsPerSample == 16)
 		{
 			_Result -= _Result % 4;
 		}
@@ -53,9 +53,9 @@ size_t AuroraCore::Sound::CPUBuffer::GetSecondIndex(const float _Second, const s
 	return _Result;
 }
 
-float AuroraCore::Sound::CPUBuffer::GetIndexSecond(const size_t _Index, const size_t _Size, const WAVEFORMATEX& _AudioInfo)
+float AuroraCore::Sound::CPUBuffer::GetIndexSecond(const size_t _Index, const size_t _Size, const WAVEFORMATEX& _SoundInfo)
 {
-	float _TotalTime = GetTotalTime(_Size, _AudioInfo);
+	float _TotalTime = GetTotalTime(_Size, _SoundInfo);
 
 	if (_TotalTime == 0.0f)
 	{
@@ -65,10 +65,10 @@ float AuroraCore::Sound::CPUBuffer::GetIndexSecond(const size_t _Index, const si
 	return _TotalTime * (float)(_Index % _Size) / (float)(_Size);
 }
 
-uint8_t* AuroraCore::Sound::CPUBuffer::LoadAudioFile(const wchar_t* _Path, size_t& _Size, WAVEFORMATEX& _AudioInfo)
+uint8_t* AuroraCore::Sound::CPUBuffer::LoadSoundFile(const wchar_t* _Path, size_t& _Size, WAVEFORMATEX& _SoundInfo)
 {
 	_Size = 0;
-	_AudioInfo = { 0 };
+	_SoundInfo = { 0 };
 
 	if (!_Path)
 	{
@@ -90,7 +90,7 @@ uint8_t* AuroraCore::Sound::CPUBuffer::LoadAudioFile(const wchar_t* _Path, size_
 		if (fread(_MagicNumbers, 1, 4, _File) != 4)
 		{
 			_Size = 0;
-			_AudioInfo = { 0 };
+			_SoundInfo = { 0 };
 			fclose(_File);
 			return nullptr;
 		}
@@ -100,7 +100,7 @@ uint8_t* AuroraCore::Sound::CPUBuffer::LoadAudioFile(const wchar_t* _Path, size_
 		if (strcmp(_MagicNumbers, "RIFF") != 0)
 		{
 			_Size = 0;
-			_AudioInfo = { 0 };
+			_SoundInfo = { 0 };
 			fclose(_File);
 			return nullptr;
 		}
@@ -110,7 +110,7 @@ uint8_t* AuroraCore::Sound::CPUBuffer::LoadAudioFile(const wchar_t* _Path, size_
 		if (fseek(_File, 0, SEEK_END) != 0)
 		{
 			_Size = 0;
-			_AudioInfo = { 0 };
+			_SoundInfo = { 0 };
 			fclose(_File);
 			return nullptr;
 		}
@@ -120,7 +120,7 @@ uint8_t* AuroraCore::Sound::CPUBuffer::LoadAudioFile(const wchar_t* _Path, size_
 		if (_TotalFileSize == -9)
 		{
 			_Size = 0;
-			_AudioInfo = { 0 };
+			_SoundInfo = { 0 };
 			fclose(_File);
 			return nullptr;
 		}
@@ -128,7 +128,7 @@ uint8_t* AuroraCore::Sound::CPUBuffer::LoadAudioFile(const wchar_t* _Path, size_
 		if (fseek(_File, 4, SEEK_SET) != 0)
 		{
 			_Size = 0;
-			_AudioInfo = { 0 };
+			_SoundInfo = { 0 };
 			fclose(_File);
 			return nullptr;
 		}
@@ -138,7 +138,7 @@ uint8_t* AuroraCore::Sound::CPUBuffer::LoadAudioFile(const wchar_t* _Path, size_
 		if (fread(&_ReadFileSize, 4, 1, _File) != 1)
 		{
 			_Size = 0;
-			_AudioInfo = { 0 };
+			_SoundInfo = { 0 };
 			fclose(_File);
 			return nullptr;
 		}
@@ -146,7 +146,7 @@ uint8_t* AuroraCore::Sound::CPUBuffer::LoadAudioFile(const wchar_t* _Path, size_
 		if (_ReadFileSize != _TotalFileSize)
 		{
 			_Size = 0;
-			_AudioInfo = { 0 };
+			_SoundInfo = { 0 };
 			fclose(_File);
 			return nullptr;
 		}
@@ -158,7 +158,7 @@ uint8_t* AuroraCore::Sound::CPUBuffer::LoadAudioFile(const wchar_t* _Path, size_
 		if (fread(_MagicNumbers, 1, 8, _File) != 8)
 		{
 			_Size = 0;
-			_AudioInfo = { 0 };
+			_SoundInfo = { 0 };
 			fclose(_File);
 			return nullptr;
 		}
@@ -168,7 +168,7 @@ uint8_t* AuroraCore::Sound::CPUBuffer::LoadAudioFile(const wchar_t* _Path, size_
 		if (strcmp(_MagicNumbers, "WAVEfmt ") != 0)
 		{
 			_Size = 0;
-			_AudioInfo = { 0 };
+			_SoundInfo = { 0 };
 			fclose(_File);
 			return nullptr;
 		}
@@ -180,7 +180,7 @@ uint8_t* AuroraCore::Sound::CPUBuffer::LoadAudioFile(const wchar_t* _Path, size_
 		if (fread(&_SubChunkSize, 4, 1, _File) != 1)
 		{
 			_Size = 0;
-			_AudioInfo = { 0 };
+			_SoundInfo = { 0 };
 			fclose(_File);
 			return nullptr;
 		}
@@ -188,104 +188,104 @@ uint8_t* AuroraCore::Sound::CPUBuffer::LoadAudioFile(const wchar_t* _Path, size_
 		if (_SubChunkSize != 16)
 		{
 			_Size = 0;
-			_AudioInfo = { 0 };
+			_SoundInfo = { 0 };
 			fclose(_File);
 			return nullptr;
 		}
 	}
 
-	if (fread(&_AudioInfo.wFormatTag, 2, 1, _File) != 1)
+	if (fread(&_SoundInfo.wFormatTag, 2, 1, _File) != 1)
 	{
 		_Size = 0;
-		_AudioInfo = { 0 };
+		_SoundInfo = { 0 };
 		fclose(_File);
 		return nullptr;
 	}
 
-	if (_AudioInfo.wFormatTag != 1)
+	if (_SoundInfo.wFormatTag != 1)
 	{
 		_Size = 0;
-		_AudioInfo = { 0 };
+		_SoundInfo = { 0 };
 		fclose(_File);
 		return nullptr;
 	}
 
-	if (fread(&_AudioInfo.nChannels, 2, 1, _File) != 1)
+	if (fread(&_SoundInfo.nChannels, 2, 1, _File) != 1)
 	{
 		_Size = 0;
-		_AudioInfo = { 0 };
+		_SoundInfo = { 0 };
 		fclose(_File);
 		return nullptr;
 	}
 
-	if (_AudioInfo.nChannels != 1 && _AudioInfo.nChannels != 2)
+	if (_SoundInfo.nChannels != 1 && _SoundInfo.nChannels != 2)
 	{
 		_Size = 0;
-		_AudioInfo = { 0 };
+		_SoundInfo = { 0 };
 		fclose(_File);
 		return nullptr;
 	}
 
-	if (fread(&_AudioInfo.nSamplesPerSec, 4, 1, _File) != 1)
+	if (fread(&_SoundInfo.nSamplesPerSec, 4, 1, _File) != 1)
 	{
 		_Size = 0;
-		_AudioInfo = { 0 };
+		_SoundInfo = { 0 };
 		fclose(_File);
 		return nullptr;
 	}
 
-	if (_AudioInfo.nSamplesPerSec == 0)
+	if (_SoundInfo.nSamplesPerSec == 0)
 	{
 		_Size = 0;
-		_AudioInfo = { 0 };
+		_SoundInfo = { 0 };
 		fclose(_File);
 		return nullptr;
 	}
 
-	if (fread(&_AudioInfo.nAvgBytesPerSec, 4, 1, _File) != 1)
+	if (fread(&_SoundInfo.nAvgBytesPerSec, 4, 1, _File) != 1)
 	{
 		_Size = 0;
-		_AudioInfo = { 0 };
+		_SoundInfo = { 0 };
 		fclose(_File);
 		return nullptr;
 	}
 
-	if (_AudioInfo.nAvgBytesPerSec == 0)
+	if (_SoundInfo.nAvgBytesPerSec == 0)
 	{
 		_Size = 0;
-		_AudioInfo = { 0 };
+		_SoundInfo = { 0 };
 		fclose(_File);
 		return nullptr;
 	}
 
-	if (fread(&_AudioInfo.nBlockAlign, 2, 1, _File) != 1)
+	if (fread(&_SoundInfo.nBlockAlign, 2, 1, _File) != 1)
 	{
 		_Size = 0;
-		_AudioInfo = { 0 };
+		_SoundInfo = { 0 };
 		fclose(_File);
 		return nullptr;
 	}
 
-	if (_AudioInfo.nBlockAlign == 0)
+	if (_SoundInfo.nBlockAlign == 0)
 	{
 		_Size = 0;
-		_AudioInfo = { 0 };
+		_SoundInfo = { 0 };
 		fclose(_File);
 		return nullptr;
 	}
 
-	if (fread(&_AudioInfo.wBitsPerSample, 2, 1, _File) != 1)
+	if (fread(&_SoundInfo.wBitsPerSample, 2, 1, _File) != 1)
 	{
 		_Size = 0;
-		_AudioInfo = { 0 };
+		_SoundInfo = { 0 };
 		fclose(_File);
 		return nullptr;
 	}
 
-	if (_AudioInfo.wBitsPerSample != 8 && _AudioInfo.wBitsPerSample != 16)
+	if (_SoundInfo.wBitsPerSample != 8 && _SoundInfo.wBitsPerSample != 16)
 	{
 		_Size = 0;
-		_AudioInfo = { 0 };
+		_SoundInfo = { 0 };
 		fclose(_File);
 		return nullptr;
 	}
@@ -296,7 +296,7 @@ uint8_t* AuroraCore::Sound::CPUBuffer::LoadAudioFile(const wchar_t* _Path, size_
 		if (fread(_MagicNumbers, 1, 4, _File) != 4)
 		{
 			_Size = 0;
-			_AudioInfo = { 0 };
+			_SoundInfo = { 0 };
 			fclose(_File);
 			return nullptr;
 		}
@@ -306,7 +306,7 @@ uint8_t* AuroraCore::Sound::CPUBuffer::LoadAudioFile(const wchar_t* _Path, size_
 		if (strcmp(_MagicNumbers, "data") != 0)
 		{
 			_Size = 0;
-			_AudioInfo = { 0 };
+			_SoundInfo = { 0 };
 			fclose(_File);
 			return nullptr;
 		}
@@ -318,7 +318,7 @@ uint8_t* AuroraCore::Sound::CPUBuffer::LoadAudioFile(const wchar_t* _Path, size_
 		if (fread(&_BufferSize, 4, 1, _File) != 1)
 		{
 			_Size = 0;
-			_AudioInfo = { 0 };
+			_SoundInfo = { 0 };
 			fclose(_File);
 			return nullptr;
 		}
@@ -326,7 +326,7 @@ uint8_t* AuroraCore::Sound::CPUBuffer::LoadAudioFile(const wchar_t* _Path, size_
 		if (_BufferSize == 0)
 		{
 			_Size = 0;
-			_AudioInfo = { 0 };
+			_SoundInfo = { 0 };
 			fclose(_File);
 			return nullptr;
 		}
@@ -334,26 +334,26 @@ uint8_t* AuroraCore::Sound::CPUBuffer::LoadAudioFile(const wchar_t* _Path, size_
 		_Size = _BufferSize;
 	}
 
-	if (_AudioInfo.wBitsPerSample == 16 && _Size % 2 == 1)
+	if (_SoundInfo.wBitsPerSample == 16 && _Size % 2 == 1)
 	{
 		_Size = 0;
-		_AudioInfo = { 0 };
+		_SoundInfo = { 0 };
 		fclose(_File);
 		return nullptr;
 	}
 
-	if (_AudioInfo.nBlockAlign != _AudioInfo.nChannels * _AudioInfo.wBitsPerSample / 8)
+	if (_SoundInfo.nBlockAlign != _SoundInfo.nChannels * _SoundInfo.wBitsPerSample / 8)
 	{
 		_Size = 0;
-		_AudioInfo = { 0 };
+		_SoundInfo = { 0 };
 		fclose(_File);
 		return nullptr;
 	}
 
-	if (_AudioInfo.nAvgBytesPerSec != _AudioInfo.nSamplesPerSec * _AudioInfo.nChannels * _AudioInfo.wBitsPerSample / 8)
+	if (_SoundInfo.nAvgBytesPerSec != _SoundInfo.nSamplesPerSec * _SoundInfo.nChannels * _SoundInfo.wBitsPerSample / 8)
 	{
 		_Size = 0;
-		_AudioInfo = { 0 };
+		_SoundInfo = { 0 };
 		fclose(_File);
 		return nullptr;
 	}
@@ -363,7 +363,7 @@ uint8_t* AuroraCore::Sound::CPUBuffer::LoadAudioFile(const wchar_t* _Path, size_
 	if (_Data == nullptr)
 	{
 		_Size = 0;
-		_AudioInfo = { 0 };
+		_SoundInfo = { 0 };
 		fclose(_File);
 		return nullptr;
 	}
@@ -372,14 +372,14 @@ uint8_t* AuroraCore::Sound::CPUBuffer::LoadAudioFile(const wchar_t* _Path, size_
 	{
 		delete[] _Data;
 		_Size = 0;
-		_AudioInfo = { 0 };
+		_SoundInfo = { 0 };
 		fclose(_File);
 		return nullptr;
 	}
 
 #ifdef AURORA_CORE_BIG_ENDIAN
 
-	if (_AudioInfo.wBitsPerSample == 16)
+	if (_SoundInfo.wBitsPerSample == 16)
 	{
 		for (size_t _Index = 0; _Index < _Size / 2; _Index++)
 		{
@@ -391,29 +391,222 @@ uint8_t* AuroraCore::Sound::CPUBuffer::LoadAudioFile(const wchar_t* _Path, size_
 
 #endif
 
-	if (fgetc(_File) != EOF)
-	{
-		delete[] _Data;
-		_Size = 0;
-		_AudioInfo = { 0 };
-		fclose(_File);
-		return nullptr;
-	}
-
 	fclose(_File);
 
 	return _Data;
 }
 
-uint8_t* AuroraCore::Sound::CPUBuffer::LoadAudioResource(const HINSTANCE _InstanceHandle, const uint32_t _ResourceId, size_t& _Size, WAVEFORMATEX& _AudioInfo)
+uint8_t* AuroraCore::Sound::CPUBuffer::LoadSoundResource(const HINSTANCE _InstanceHandle, const uint32_t _ResourceId, size_t& _Size, WAVEFORMATEX& _SoundInfo)
 {
 	_Size = 0;
-	_AudioInfo = { 0 };
+	_SoundInfo = { 0 };
 
-	return nullptr;
+	HRSRC _ResourceHandle = FindResource(_InstanceHandle, MAKEINTRESOURCE(_ResourceId), MAKEINTRESOURCE(AURORA_CORE_WAV_RESOURCE));
+
+	if (!_ResourceHandle)
+	{
+		return nullptr;
+	}
+
+	_Size = SizeofResource(_InstanceHandle, _ResourceHandle);
+
+	if (_Size <= 44)
+	{
+		_Size = 0;
+		_SoundInfo = { 0 };
+		return nullptr;
+	}
+
+	_Size -= 44;
+
+	HGLOBAL _ResourceMemory = LoadResource(_InstanceHandle, _ResourceHandle);
+
+	if (!_ResourceMemory)
+	{
+		_Size = 0;
+		_SoundInfo = { 0 };
+		return nullptr;
+	}
+
+	if (((char*)(_ResourceMemory))[0] != 'R' || ((char*)(_ResourceMemory))[1] != 'I' || ((char*)(_ResourceMemory))[2] != 'F' || ((char*)(_ResourceMemory))[3] != 'F')
+	{
+		FreeResource(_ResourceMemory);
+		_Size = 0;
+		_SoundInfo = { 0 };
+		return nullptr;
+	}
+
+	{
+		int32_t _TotalFileSize = (int32_t)(_Size) + 44 - 8;
+
+		int32_t _ReadFileSize = *(int32_t*)((uint8_t*)(_ResourceMemory) + 4);
+
+		if (_ReadFileSize != _TotalFileSize)
+		{
+			FreeResource(_ResourceMemory);
+			_Size = 0;
+			_SoundInfo = { 0 };
+			return nullptr;
+		}
+	}
+
+	if (((char*)(_ResourceMemory))[8] != 'W' || ((char*)(_ResourceMemory))[9] != 'A' || ((char*)(_ResourceMemory))[10] != 'V' || ((char*)(_ResourceMemory))[11] != 'E')
+	{
+		FreeResource(_ResourceMemory);
+		_Size = 0;
+		_SoundInfo = { 0 };
+		return nullptr;
+	}
+
+	if (((char*)(_ResourceMemory))[12] != 'f' || ((char*)(_ResourceMemory))[13] != 'm' || ((char*)(_ResourceMemory))[14] != 't' || ((char*)(_ResourceMemory))[15] != ' ')
+	{
+		FreeResource(_ResourceMemory);
+		_Size = 0;
+		_SoundInfo = { 0 };
+		return nullptr;
+	}
+
+	if (*(uint32_t*)((uint8_t*)(_ResourceMemory) + 16) != 16)
+	{
+		FreeResource(_ResourceMemory);
+		_Size = 0;
+		_SoundInfo = { 0 };
+		return nullptr;
+	}
+
+	_SoundInfo.wFormatTag = *(uint16_t*)((uint8_t*)(_ResourceMemory) + 20);
+
+	if (_SoundInfo.wFormatTag != 1)
+	{
+		FreeResource(_ResourceMemory);
+		_Size = 0;
+		_SoundInfo = { 0 };
+		return nullptr;
+	}
+
+	_SoundInfo.nChannels = *(uint16_t*)((uint8_t*)(_ResourceMemory) + 22);
+
+	if (_SoundInfo.nChannels != 1 && _SoundInfo.nChannels != 2)
+	{
+		FreeResource(_ResourceMemory);
+		_Size = 0;
+		_SoundInfo = { 0 };
+		return nullptr;
+	}
+
+	_SoundInfo.nSamplesPerSec = *(uint32_t*)((uint8_t*)(_ResourceMemory) + 24);
+
+	if (_SoundInfo.nSamplesPerSec == 0)
+	{
+		FreeResource(_ResourceMemory);
+		_Size = 0;
+		_SoundInfo = { 0 };
+		return nullptr;
+	}
+
+	_SoundInfo.nAvgBytesPerSec = *(uint32_t*)((uint8_t*)(_ResourceMemory) + 28);
+
+	if (_SoundInfo.nAvgBytesPerSec == 0)
+	{
+		FreeResource(_ResourceMemory);
+		_Size = 0;
+		_SoundInfo = { 0 };
+		return nullptr;
+	}
+
+	_SoundInfo.nBlockAlign = *(uint16_t*)((uint8_t*)(_ResourceMemory) + 32);
+
+	if (_SoundInfo.nBlockAlign == 0)
+	{
+		FreeResource(_ResourceMemory);
+		_Size = 0;
+		_SoundInfo = { 0 };
+		return nullptr;
+	}
+
+	_SoundInfo.wBitsPerSample = *(uint16_t*)((uint8_t*)(_ResourceMemory) + 34);
+
+	if (_SoundInfo.wBitsPerSample != 8 && _SoundInfo.wBitsPerSample != 16)
+	{
+		FreeResource(_ResourceMemory);
+		_Size = 0;
+		_SoundInfo = { 0 };
+		return nullptr;
+	}
+
+	if (((char*)(_ResourceMemory))[36] != 'd' || ((char*)(_ResourceMemory))[37] != 'a' || ((char*)(_ResourceMemory))[38] != 't' || ((char*)(_ResourceMemory))[39] != 'a')
+	{
+		FreeResource(_ResourceMemory);
+		_Size = 0;
+		_SoundInfo = { 0 };
+		return nullptr;
+	}
+
+	{
+		uint32_t _BufferSize = *(uint32_t*)((uint8_t*)(_ResourceMemory) + 40);
+
+		if (_BufferSize == 0)
+		{
+			FreeResource(_ResourceMemory);
+			_Size = 0;
+			_SoundInfo = { 0 };
+			return nullptr;
+		}
+
+		if (_Size != _BufferSize)
+		{
+			FreeResource(_ResourceMemory);
+			_Size = 0;
+			_SoundInfo = { 0 };
+			return nullptr;
+		}
+	}
+
+	if (_SoundInfo.wBitsPerSample == 16 && _Size % 2 == 1)
+	{
+		FreeResource(_ResourceMemory);
+		_Size = 0;
+		_SoundInfo = { 0 };
+		return nullptr;
+	}
+
+	if (_SoundInfo.nBlockAlign != _SoundInfo.nChannels * _SoundInfo.wBitsPerSample / 8)
+	{
+		FreeResource(_ResourceMemory);
+		_Size = 0;
+		_SoundInfo = { 0 };
+		return nullptr;
+	}
+
+	if (_SoundInfo.nAvgBytesPerSec != _SoundInfo.nSamplesPerSec * _SoundInfo.nChannels * _SoundInfo.wBitsPerSample / 8)
+	{
+		FreeResource(_ResourceMemory);
+		_Size = 0;
+		_SoundInfo = { 0 };
+		return nullptr;
+	}
+
+	uint8_t* _Data = new uint8_t[_Size];
+
+	if (_Data == nullptr)
+	{
+		FreeResource(_ResourceMemory);
+		_Size = 0;
+		_SoundInfo = { 0 };
+		return nullptr;
+	}
+
+	for (size_t _Index = 0; _Index < _Size; _Index++)
+	{
+		_Data[_Index] = *((uint8_t*)(_ResourceMemory) + _Index);
+	}
+
+	FreeResource(_ResourceMemory);
+
+	return _Data;
 }
 
-bool AuroraCore::Sound::CPUBuffer::SaveAudioFile(const wchar_t* _Path, const uint8_t* _Data, const size_t _Size, const WAVEFORMATEX& _AudioInfo)
+bool AuroraCore::Sound::CPUBuffer::SaveSoundFile(const wchar_t* _Path, const uint8_t* _Data, const size_t _Size, const WAVEFORMATEX& _SoundInfo)
 {
 	if (!_Path)
 	{
@@ -421,6 +614,11 @@ bool AuroraCore::Sound::CPUBuffer::SaveAudioFile(const wchar_t* _Path, const uin
 	}
 
 	if (!_Data || !_Size)
+	{
+		return false;
+	}
+
+	if (_SoundInfo.wFormatTag != 1 || (_SoundInfo.nChannels != 1 && _SoundInfo.nChannels != 2) || _SoundInfo.nSamplesPerSec == 0 || _SoundInfo.nAvgBytesPerSec == 0 || _SoundInfo.nBlockAlign == 0 || (_SoundInfo.wBitsPerSample != 8 && _SoundInfo.wBitsPerSample != 16) || (_SoundInfo.wBitsPerSample == 16 && _Size % 2 == 1) || (_SoundInfo.nBlockAlign != _SoundInfo.nChannels * _SoundInfo.wBitsPerSample / 8) || (_SoundInfo.nAvgBytesPerSec != _SoundInfo.nSamplesPerSec * _SoundInfo.nChannels * _SoundInfo.wBitsPerSample / 8))
 	{
 		return false;
 	}
@@ -452,42 +650,42 @@ bool AuroraCore::Sound::CPUBuffer::SaveAudioFile(const wchar_t* _Path, const uin
 		}
 	}
 
-	if (fwrite(&_AudioInfo.wFormatTag, 2, 1, _File) != 1)
+	if (fwrite(&_SoundInfo.wFormatTag, 2, 1, _File) != 1)
 	{
 		fclose(_File);
 		_wremove(_Path);
 		return false;
 	}
 
-	if (fwrite(&_AudioInfo.nChannels, 2, 1, _File) != 1)
+	if (fwrite(&_SoundInfo.nChannels, 2, 1, _File) != 1)
 	{
 		fclose(_File);
 		_wremove(_Path);
 		return false;
 	}
 
-	if (fwrite(&_AudioInfo.nSamplesPerSec, 4, 1, _File) != 1)
+	if (fwrite(&_SoundInfo.nSamplesPerSec, 4, 1, _File) != 1)
 	{
 		fclose(_File);
 		_wremove(_Path);
 		return false;
 	}
 
-	if (fwrite(&_AudioInfo.nAvgBytesPerSec, 4, 1, _File) != 1)
+	if (fwrite(&_SoundInfo.nAvgBytesPerSec, 4, 1, _File) != 1)
 	{
 		fclose(_File);
 		_wremove(_Path);
 		return false;
 	}
 
-	if (fwrite(&_AudioInfo.nBlockAlign, 2, 1, _File) != 1)
+	if (fwrite(&_SoundInfo.nBlockAlign, 2, 1, _File) != 1)
 	{
 		fclose(_File);
 		_wremove(_Path);
 		return false;
 	}
 
-	if (fwrite(&_AudioInfo.wBitsPerSample, 2, 1, _File) != 1)
+	if (fwrite(&_SoundInfo.wBitsPerSample, 2, 1, _File) != 1)
 	{
 		fclose(_File);
 		_wremove(_Path);
@@ -502,7 +700,7 @@ bool AuroraCore::Sound::CPUBuffer::SaveAudioFile(const wchar_t* _Path, const uin
 	}
 
 	{
-		uint32_t _BufferSize = _Size;
+		uint32_t _BufferSize = (uint32_t)(_Size);
 
 		if (fwrite(&_BufferSize, 4, 1, _File) != 1)
 		{
@@ -512,12 +710,49 @@ bool AuroraCore::Sound::CPUBuffer::SaveAudioFile(const wchar_t* _Path, const uin
 		}
 	}
 
+#ifdef AURORA_CORE_LITTLE_ENDIAN
+
 	if (fwrite(_Data, 1, _Size, _File) != _Size)
 	{
 		fclose(_File);
 		_wremove(_Path);
 		return false;
 	}
+
+#endif
+
+#ifdef AURORA_CORE_BIG_ENDIAN
+
+	if (_SoundInfo.wBitsPerSample == 8)
+	{
+		if (fwrite(_Data, 1, _Size, _File) != _Size)
+		{
+			fclose(_File);
+			_wremove(_Path);
+			return false;
+		}
+	}
+	else
+	{
+		for (size_t _Index = 0; _Index < _Size / 2; _Index++)
+		{
+			if (fwrite(_Data + _Index * 2 + 1, 1, 1, _File) != 1)
+			{
+				fclose(_File);
+				_wremove(_Path);
+				return false;
+			}
+
+			if (fwrite(_Data + _Index * 2 + 0, 1, 1, _File) != 1)
+			{
+				fclose(_File);
+				_wremove(_Path);
+				return false;
+			}
+		}
+	}
+
+#endif
 
 	{
 		int32_t _FileSize = ftell(_File) - 8;
@@ -938,16 +1173,16 @@ AuroraCore::Sound::Context& AuroraCore::Sound::Context::operator= (Context&& _Ot
 
 
 
-AuroraCore::Sound::Buffer::Buffer() : DirectSoundBuffer(nullptr), Size(0), AudioInfo({0})
+AuroraCore::Sound::Buffer::Buffer() : DirectSoundBuffer(nullptr), Size(0), SoundInfo({0})
 {
 
 }
 
-AuroraCore::Sound::Buffer::Buffer(Buffer&& _Other) noexcept : DirectSoundBuffer(_Other.DirectSoundBuffer), Size(_Other.Size), AudioInfo(_Other.AudioInfo)
+AuroraCore::Sound::Buffer::Buffer(Buffer&& _Other) noexcept : DirectSoundBuffer(_Other.DirectSoundBuffer), Size(_Other.Size), SoundInfo(_Other.SoundInfo)
 {
 	_Other.DirectSoundBuffer = nullptr;
 	_Other.Size = 0;
-	_Other.AudioInfo = { 0 };
+	_Other.SoundInfo = { 0 };
 }
 
 AuroraCore::Sound::Buffer::~Buffer()
@@ -955,7 +1190,7 @@ AuroraCore::Sound::Buffer::~Buffer()
 	AURORA_CORE_ASSERT_MSG(!CheckCreated(), AURORA_CORE_STRING_PREFIX("Sound buffer was not cleaned up!"));
 }
 
-bool AuroraCore::Sound::Buffer::Create(Context& _Context, const size_t _Size, const WAVEFORMATEX& _AudioInfo, const uint8_t* _Data)
+bool AuroraCore::Sound::Buffer::Create(Context& _Context, const size_t _Size, const WAVEFORMATEX& _SoundInfo, const uint8_t* _Data)
 {
 	Destroy();
 
@@ -964,7 +1199,7 @@ bool AuroraCore::Sound::Buffer::Create(Context& _Context, const size_t _Size, co
 		return false;
 	}
 
-	WAVEFORMATEX _BufferAudioInfo = _AudioInfo;
+	WAVEFORMATEX _BufferSoundInfo = _SoundInfo;
 
 	DSBUFFERDESC _BufferDesc = { 0 };
 
@@ -972,7 +1207,7 @@ bool AuroraCore::Sound::Buffer::Create(Context& _Context, const size_t _Size, co
 	_BufferDesc.dwFlags = DSBCAPS_CTRLFREQUENCY | DSBCAPS_CTRLVOLUME | DSBCAPS_GLOBALFOCUS;
 	_BufferDesc.dwBufferBytes = (DWORD)(_Size);
 	_BufferDesc.dwReserved = 0;
-	_BufferDesc.lpwfxFormat = &_BufferAudioInfo;
+	_BufferDesc.lpwfxFormat = &_BufferSoundInfo;
 	_BufferDesc.guid3DAlgorithm = DS3DALG_DEFAULT;
 
 	HRESULT _Result = _Context.DirectSoundContext->CreateSoundBuffer(&_BufferDesc, &DirectSoundBuffer, nullptr);
@@ -1015,7 +1250,7 @@ bool AuroraCore::Sound::Buffer::Create(Context& _Context, const size_t _Size, co
 	}
 
 	Size = _Size;
-	AudioInfo = _AudioInfo;
+	SoundInfo = _SoundInfo;
 
 	return true;
 }
@@ -1024,7 +1259,7 @@ void AuroraCore::Sound::Buffer::Destroy()
 {
 	AURORA_CORE_COM_RELEASE(DirectSoundBuffer);
 	Size = 0;
-	AudioInfo = { 0 };
+	SoundInfo = { 0 };
 }
 
 bool AuroraCore::Sound::Buffer::Lock(const size_t _Offset, const size_t _Size, uint8_t** _Buff1, size_t& _BuffSize1, uint8_t** _Buff2, size_t& _BuffSize2)
@@ -1074,12 +1309,12 @@ const bool AuroraCore::Sound::Buffer::CheckCreated() const
 
 const float AuroraCore::Sound::Buffer::GetTotalTime() const
 {
-	if (!CheckCreated() || (AudioInfo.nChannels != 1 && AudioInfo.nChannels != 2) || (AudioInfo.wBitsPerSample != 8 && AudioInfo.wBitsPerSample != 16) || AudioInfo.nAvgBytesPerSec == 0)
+	if (!CheckCreated() || (SoundInfo.nChannels != 1 && SoundInfo.nChannels != 2) || (SoundInfo.wBitsPerSample != 8 && SoundInfo.wBitsPerSample != 16) || SoundInfo.nAvgBytesPerSec == 0)
 	{
 		return 0.0f;
 	}
 
-	return (float)(Size) / (float)(AudioInfo.nAvgBytesPerSec);
+	return (float)(Size) / (float)(SoundInfo.nAvgBytesPerSec);
 }
 
 const size_t AuroraCore::Sound::Buffer::GetSecondIndex(const float _Second) const
@@ -1095,20 +1330,20 @@ const size_t AuroraCore::Sound::Buffer::GetSecondIndex(const float _Second) cons
 
 	size_t _Result = (size_t)(_MappedSecond / _TotalTime * (float)(Size));
 
-	if (AudioInfo.nChannels == 1)
+	if (SoundInfo.nChannels == 1)
 	{
-		if (AudioInfo.wBitsPerSample == 16)
+		if (SoundInfo.wBitsPerSample == 16)
 		{
 			_Result -= _Result % 2;
 		}
 	}
-	if (AudioInfo.nChannels == 2)
+	if (SoundInfo.nChannels == 2)
 	{
-		if (AudioInfo.wBitsPerSample == 8)
+		if (SoundInfo.wBitsPerSample == 8)
 		{
 			_Result -= _Result % 2;
 		}
-		if (AudioInfo.wBitsPerSample == 16)
+		if (SoundInfo.wBitsPerSample == 16)
 		{
 			_Result -= _Result % 4;
 		}
@@ -1134,9 +1369,9 @@ const size_t AuroraCore::Sound::Buffer::GetSize() const
 	return Size;
 }
 
-const WAVEFORMATEX AuroraCore::Sound::Buffer::GetAudioInfo() const
+const WAVEFORMATEX AuroraCore::Sound::Buffer::GetSoundInfo() const
 {
-	return AudioInfo;
+	return SoundInfo;
 }
 
 AuroraCore::Sound::Buffer& AuroraCore::Sound::Buffer::operator= (Buffer&& _Other) noexcept
@@ -1145,27 +1380,27 @@ AuroraCore::Sound::Buffer& AuroraCore::Sound::Buffer::operator= (Buffer&& _Other
 
 	DirectSoundBuffer = _Other.DirectSoundBuffer;
 	Size = _Other.Size;
-	AudioInfo = _Other.AudioInfo;
+	SoundInfo = _Other.SoundInfo;
 
 	_Other.DirectSoundBuffer = nullptr;
 	_Other.Size = 0;
-	_Other.AudioInfo = { 0 };
+	_Other.SoundInfo = { 0 };
 
 	return *this;
 }
 
 
 
-AuroraCore::Sound::Buffer3D::Buffer3D() : DirectSoundBuffer(nullptr), Size(0), AudioInfo({0})
+AuroraCore::Sound::Buffer3D::Buffer3D() : DirectSoundBuffer(nullptr), Size(0), SoundInfo({0})
 {
 
 }
 
-AuroraCore::Sound::Buffer3D::Buffer3D(Buffer3D&& _Other) noexcept : DirectSoundBuffer(_Other.DirectSoundBuffer), Size(_Other.Size), AudioInfo(_Other.AudioInfo)
+AuroraCore::Sound::Buffer3D::Buffer3D(Buffer3D&& _Other) noexcept : DirectSoundBuffer(_Other.DirectSoundBuffer), Size(_Other.Size), SoundInfo(_Other.SoundInfo)
 {
 	_Other.DirectSoundBuffer = nullptr;
 	_Other.Size = 0;
-	_Other.AudioInfo = { 0 };
+	_Other.SoundInfo = { 0 };
 }
 
 AuroraCore::Sound::Buffer3D::~Buffer3D()
@@ -1173,16 +1408,16 @@ AuroraCore::Sound::Buffer3D::~Buffer3D()
 	AURORA_CORE_ASSERT_MSG(!CheckCreated(), AURORA_CORE_STRING_PREFIX("3D sound buffer was not cleaned up!"));
 }
 
-bool AuroraCore::Sound::Buffer3D::Create(Context& _Context, const size_t _Size, const WAVEFORMATEX& _AudioInfo, const uint8_t* _Data)
+bool AuroraCore::Sound::Buffer3D::Create(Context& _Context, const size_t _Size, const WAVEFORMATEX& _SoundInfo, const uint8_t* _Data)
 {
 	Destroy();
 
-	if (!_Context.CheckCreated() || _Size == 0 || _AudioInfo.nChannels != 1)
+	if (!_Context.CheckCreated() || _Size == 0 || _SoundInfo.nChannels != 1)
 	{
 		return false;
 	}
 
-	WAVEFORMATEX _BufferAudioInfo = _AudioInfo;
+	WAVEFORMATEX _BufferSoundInfo = _SoundInfo;
 
 	DSBUFFERDESC _BufferDesc = { 0 };
 
@@ -1190,7 +1425,7 @@ bool AuroraCore::Sound::Buffer3D::Create(Context& _Context, const size_t _Size, 
 	_BufferDesc.dwFlags = DSBCAPS_CTRL3D | DSBCAPS_CTRLFREQUENCY | DSBCAPS_CTRLVOLUME | DSBCAPS_GLOBALFOCUS;
 	_BufferDesc.dwBufferBytes = (DWORD)(_Size);
 	_BufferDesc.dwReserved = 0;
-	_BufferDesc.lpwfxFormat = &_BufferAudioInfo;
+	_BufferDesc.lpwfxFormat = &_BufferSoundInfo;
 	_BufferDesc.guid3DAlgorithm = DS3DALG_DEFAULT;
 
 	HRESULT _Result = _Context.DirectSoundContext->CreateSoundBuffer(&_BufferDesc, &DirectSoundBuffer, nullptr);
@@ -1233,7 +1468,7 @@ bool AuroraCore::Sound::Buffer3D::Create(Context& _Context, const size_t _Size, 
 	}
 
 	Size = _Size;
-	AudioInfo = _AudioInfo;
+	SoundInfo = _SoundInfo;
 
 	return true;
 }
@@ -1242,7 +1477,7 @@ void AuroraCore::Sound::Buffer3D::Destroy()
 {
 	AURORA_CORE_COM_RELEASE(DirectSoundBuffer);
 	Size = 0;
-	AudioInfo = { 0 };
+	SoundInfo = { 0 };
 }
 
 bool AuroraCore::Sound::Buffer3D::Lock(const size_t _Offset, const size_t _Size, uint8_t** _Buff1, size_t& _BuffSize1, uint8_t** _Buff2, size_t& _BuffSize2)
@@ -1292,12 +1527,12 @@ const bool AuroraCore::Sound::Buffer3D::CheckCreated() const
 
 const float AuroraCore::Sound::Buffer3D::GetTotalTime() const
 {
-	if (!CheckCreated() || (AudioInfo.nChannels != 1 && AudioInfo.nChannels != 2) || (AudioInfo.wBitsPerSample != 8 && AudioInfo.wBitsPerSample != 16) || AudioInfo.nAvgBytesPerSec == 0)
+	if (!CheckCreated() || (SoundInfo.nChannels != 1 && SoundInfo.nChannels != 2) || (SoundInfo.wBitsPerSample != 8 && SoundInfo.wBitsPerSample != 16) || SoundInfo.nAvgBytesPerSec == 0)
 	{
 		return 0.0f;
 	}
 
-	return (float)(Size) / (float)(AudioInfo.nAvgBytesPerSec);
+	return (float)(Size) / (float)(SoundInfo.nAvgBytesPerSec);
 }
 
 const size_t AuroraCore::Sound::Buffer3D::GetSecondIndex(const float _Second) const
@@ -1313,20 +1548,20 @@ const size_t AuroraCore::Sound::Buffer3D::GetSecondIndex(const float _Second) co
 
 	size_t _Result = (size_t)(_MappedSecond / _TotalTime * (float)(Size));
 
-	if (AudioInfo.nChannels == 1)
+	if (SoundInfo.nChannels == 1)
 	{
-		if (AudioInfo.wBitsPerSample == 16)
+		if (SoundInfo.wBitsPerSample == 16)
 		{
 			_Result -= _Result % 2;
 		}
 	}
-	if (AudioInfo.nChannels == 2)
+	if (SoundInfo.nChannels == 2)
 	{
-		if (AudioInfo.wBitsPerSample == 8)
+		if (SoundInfo.wBitsPerSample == 8)
 		{
 			_Result -= _Result % 2;
 		}
-		if (AudioInfo.wBitsPerSample == 16)
+		if (SoundInfo.wBitsPerSample == 16)
 		{
 			_Result -= _Result % 4;
 		}
@@ -1352,9 +1587,9 @@ const size_t AuroraCore::Sound::Buffer3D::GetSize() const
 	return Size;
 }
 
-const WAVEFORMATEX AuroraCore::Sound::Buffer3D::GetAudioInfo() const
+const WAVEFORMATEX AuroraCore::Sound::Buffer3D::GetSoundInfo() const
 {
-	return AudioInfo;
+	return SoundInfo;
 }
 
 AuroraCore::Sound::Buffer3D& AuroraCore::Sound::Buffer3D::operator= (Buffer3D&& _Other) noexcept
@@ -1363,29 +1598,29 @@ AuroraCore::Sound::Buffer3D& AuroraCore::Sound::Buffer3D::operator= (Buffer3D&& 
 
 	DirectSoundBuffer = _Other.DirectSoundBuffer;
 	Size = _Other.Size;
-	AudioInfo = _Other.AudioInfo;
+	SoundInfo = _Other.SoundInfo;
 
 	_Other.DirectSoundBuffer = nullptr;
 	_Other.Size = 0;
-	_Other.AudioInfo = { 0 };
+	_Other.SoundInfo = { 0 };
 
 	return *this;
 }
 
 
 
-AuroraCore::Sound::Source::Source() : DirectSoundBuffer(nullptr), Playing(false), Looping(false), Size(0), AudioInfo({0}), PlayTime(), StartTime(0.0f)
+AuroraCore::Sound::Source::Source() : DirectSoundBuffer(nullptr), Playing(false), Looping(false), Size(0), SoundInfo({0}), PlayTime(), StartTime(0.0f)
 {
 
 }
 
-AuroraCore::Sound::Source::Source(Source&& _Other) noexcept : DirectSoundBuffer(_Other.DirectSoundBuffer), Playing(_Other.Playing), Looping(_Other.Looping), Size(_Other.Size), AudioInfo(_Other.AudioInfo), PlayTime(std::move(_Other.PlayTime)), StartTime(_Other.StartTime)
+AuroraCore::Sound::Source::Source(Source&& _Other) noexcept : DirectSoundBuffer(_Other.DirectSoundBuffer), Playing(_Other.Playing), Looping(_Other.Looping), Size(_Other.Size), SoundInfo(_Other.SoundInfo), PlayTime(std::move(_Other.PlayTime)), StartTime(_Other.StartTime)
 {
 	_Other.DirectSoundBuffer = nullptr;
 	_Other.Playing = false;
 	_Other.Looping = false;
 	_Other.Size = 0;
-	_Other.AudioInfo = { 0 };
+	_Other.SoundInfo = { 0 };
 	_Other.StartTime = 0.0f;
 }
 
@@ -1423,7 +1658,7 @@ bool AuroraCore::Sound::Source::Create(Context& _Context, Buffer& _Buffer)
 	AURORA_CORE_COM_RELEASE(_TempBuffer);
 
 	Size = _Buffer.GetSize();
-	AudioInfo = _Buffer.GetAudioInfo();
+	SoundInfo = _Buffer.GetSoundInfo();
 
 	return true;
 }
@@ -1434,7 +1669,7 @@ void AuroraCore::Sound::Source::Destroy()
 	Playing = false;
 	Looping = false;
 	Size = 0;
-	AudioInfo = { 0 };
+	SoundInfo = { 0 };
 	PlayTime.Reset();
 	StartTime = 0.0f;
 }
@@ -1658,12 +1893,12 @@ const bool AuroraCore::Sound::Source::IsLooping() const
 
 const float AuroraCore::Sound::Source::GetTotalTime() const
 {
-	if (!CheckCreated() || (AudioInfo.nChannels != 1 && AudioInfo.nChannels != 2) || (AudioInfo.wBitsPerSample != 8 && AudioInfo.wBitsPerSample != 16) || AudioInfo.nAvgBytesPerSec == 0)
+	if (!CheckCreated() || (SoundInfo.nChannels != 1 && SoundInfo.nChannels != 2) || (SoundInfo.wBitsPerSample != 8 && SoundInfo.wBitsPerSample != 16) || SoundInfo.nAvgBytesPerSec == 0)
 	{
 		return 0.0f;
 	}
 
-	return (float)(Size) / (float)(AudioInfo.nAvgBytesPerSec);
+	return (float)(Size) / (float)(SoundInfo.nAvgBytesPerSec);
 }
 
 const size_t AuroraCore::Sound::Source::GetSecondIndex(const float _Second) const
@@ -1679,20 +1914,20 @@ const size_t AuroraCore::Sound::Source::GetSecondIndex(const float _Second) cons
 
 	size_t _Result = (size_t)(_MappedSecond / _TotalTime * (float)(Size));
 
-	if (AudioInfo.nChannels == 1)
+	if (SoundInfo.nChannels == 1)
 	{
-		if (AudioInfo.wBitsPerSample == 16)
+		if (SoundInfo.wBitsPerSample == 16)
 		{
 			_Result -= _Result % 2;
 		}
 	}
-	if (AudioInfo.nChannels == 2)
+	if (SoundInfo.nChannels == 2)
 	{
-		if (AudioInfo.wBitsPerSample == 8)
+		if (SoundInfo.wBitsPerSample == 8)
 		{
 			_Result -= _Result % 2;
 		}
-		if (AudioInfo.wBitsPerSample == 16)
+		if (SoundInfo.wBitsPerSample == 16)
 		{
 			_Result -= _Result % 4;
 		}
@@ -1728,9 +1963,9 @@ const size_t AuroraCore::Sound::Source::GetSize() const
 	return Size;
 }
 
-const WAVEFORMATEX AuroraCore::Sound::Source::GetAudioInfo() const
+const WAVEFORMATEX AuroraCore::Sound::Source::GetSoundInfo() const
 {
-	return AudioInfo;
+	return SoundInfo;
 }
 
 AuroraCore::Sound::Source& AuroraCore::Sound::Source::operator= (Source&& _Other) noexcept
@@ -1741,7 +1976,7 @@ AuroraCore::Sound::Source& AuroraCore::Sound::Source::operator= (Source&& _Other
 	Playing = _Other.Playing;
 	Looping = _Other.Looping;
 	Size = _Other.Size;
-	AudioInfo = _Other.AudioInfo;
+	SoundInfo = _Other.SoundInfo;
 	PlayTime = std::move(_Other.PlayTime);
 	StartTime = _Other.StartTime;
 
@@ -1749,7 +1984,7 @@ AuroraCore::Sound::Source& AuroraCore::Sound::Source::operator= (Source&& _Other
 	_Other.Playing = false;
 	_Other.Looping = false;
 	_Other.Size = 0;
-	_Other.AudioInfo = { 0 };
+	_Other.SoundInfo = { 0 };
 	_Other.StartTime = 0.0f;
 
 	return *this;
@@ -1757,19 +1992,19 @@ AuroraCore::Sound::Source& AuroraCore::Sound::Source::operator= (Source&& _Other
 
 
 
-AuroraCore::Sound::Source3D::Source3D() : DirectSoundBuffer(nullptr), DirectSound3DBuffer(nullptr), Playing(false), Looping(false), Size(0), AudioInfo({0}), PlayTime(), StartTime(0.0f)
+AuroraCore::Sound::Source3D::Source3D() : DirectSoundBuffer(nullptr), DirectSound3DBuffer(nullptr), Playing(false), Looping(false), Size(0), SoundInfo({0}), PlayTime(), StartTime(0.0f)
 {
 
 }
 
-AuroraCore::Sound::Source3D::Source3D(Source3D&& _Other) noexcept : DirectSoundBuffer(_Other.DirectSoundBuffer), DirectSound3DBuffer(_Other.DirectSound3DBuffer), Playing(_Other.Playing), Looping(_Other.Looping), Size(_Other.Size), AudioInfo(_Other.AudioInfo), PlayTime(std::move(_Other.PlayTime)), StartTime(_Other.StartTime)
+AuroraCore::Sound::Source3D::Source3D(Source3D&& _Other) noexcept : DirectSoundBuffer(_Other.DirectSoundBuffer), DirectSound3DBuffer(_Other.DirectSound3DBuffer), Playing(_Other.Playing), Looping(_Other.Looping), Size(_Other.Size), SoundInfo(_Other.SoundInfo), PlayTime(std::move(_Other.PlayTime)), StartTime(_Other.StartTime)
 {
 	_Other.DirectSoundBuffer = nullptr;
 	_Other.DirectSound3DBuffer = nullptr;
 	_Other.Playing = false;
 	_Other.Looping = false;
 	_Other.Size = 0;
-	_Other.AudioInfo = { 0 };
+	_Other.SoundInfo = { 0 };
 	_Other.StartTime = 0.0f;
 }
 
@@ -1815,7 +2050,7 @@ bool AuroraCore::Sound::Source3D::Create(Context& _Context, Buffer3D& _Buffer)
 	}
 
 	Size = _Buffer.GetSize();
-	AudioInfo = _Buffer.GetAudioInfo();
+	SoundInfo = _Buffer.GetSoundInfo();
 
 	return true;
 }
@@ -1827,7 +2062,7 @@ void AuroraCore::Sound::Source3D::Destroy()
 	Playing = false;
 	Looping = false;
 	Size = 0;
-	AudioInfo = { 0 };
+	SoundInfo = { 0 };
 	PlayTime.Reset();
 	StartTime = 0.0f;
 }
@@ -2325,12 +2560,12 @@ const bool AuroraCore::Sound::Source3D::IsLooping() const
 
 const float AuroraCore::Sound::Source3D::GetTotalTime() const
 {
-	if (!CheckCreated() || (AudioInfo.nChannels != 1 && AudioInfo.nChannels != 2) || (AudioInfo.wBitsPerSample != 8 && AudioInfo.wBitsPerSample != 16) || AudioInfo.nAvgBytesPerSec == 0)
+	if (!CheckCreated() || (SoundInfo.nChannels != 1 && SoundInfo.nChannels != 2) || (SoundInfo.wBitsPerSample != 8 && SoundInfo.wBitsPerSample != 16) || SoundInfo.nAvgBytesPerSec == 0)
 	{
 		return 0.0f;
 	}
 
-	return (float)(Size) / (float)(AudioInfo.nAvgBytesPerSec);
+	return (float)(Size) / (float)(SoundInfo.nAvgBytesPerSec);
 }
 
 const size_t AuroraCore::Sound::Source3D::GetSecondIndex(const float _Second) const
@@ -2346,20 +2581,20 @@ const size_t AuroraCore::Sound::Source3D::GetSecondIndex(const float _Second) co
 
 	size_t _Result = (size_t)(_MappedSecond / _TotalTime * (float)(Size));
 
-	if (AudioInfo.nChannels == 1)
+	if (SoundInfo.nChannels == 1)
 	{
-		if (AudioInfo.wBitsPerSample == 16)
+		if (SoundInfo.wBitsPerSample == 16)
 		{
 			_Result -= _Result % 2;
 		}
 	}
-	if (AudioInfo.nChannels == 2)
+	if (SoundInfo.nChannels == 2)
 	{
-		if (AudioInfo.wBitsPerSample == 8)
+		if (SoundInfo.wBitsPerSample == 8)
 		{
 			_Result -= _Result % 2;
 		}
-		if (AudioInfo.wBitsPerSample == 16)
+		if (SoundInfo.wBitsPerSample == 16)
 		{
 			_Result -= _Result % 4;
 		}
@@ -2395,9 +2630,9 @@ const size_t AuroraCore::Sound::Source3D::GetSize() const
 	return Size;
 }
 
-const WAVEFORMATEX AuroraCore::Sound::Source3D::GetAudioInfo() const
+const WAVEFORMATEX AuroraCore::Sound::Source3D::GetSoundInfo() const
 {
-	return AudioInfo;
+	return SoundInfo;
 }
 
 AuroraCore::Sound::Source3D& AuroraCore::Sound::Source3D::operator= (Source3D&& _Other) noexcept
@@ -2409,7 +2644,7 @@ AuroraCore::Sound::Source3D& AuroraCore::Sound::Source3D::operator= (Source3D&& 
 	Playing = _Other.Playing;
 	Looping = _Other.Looping;
 	Size = _Other.Size;
-	AudioInfo = _Other.AudioInfo;
+	SoundInfo = _Other.SoundInfo;
 	PlayTime = std::move(_Other.PlayTime);
 	StartTime = _Other.StartTime;
 
@@ -2418,7 +2653,7 @@ AuroraCore::Sound::Source3D& AuroraCore::Sound::Source3D::operator= (Source3D&& 
 	_Other.Playing = false;
 	_Other.Looping = false;
 	_Other.Size = 0;
-	_Other.AudioInfo = { 0 };
+	_Other.SoundInfo = { 0 };
 	_Other.StartTime = 0.0f;
 
 	return *this;

@@ -93,4 +93,8 @@
 
 
 
+#define AURORA_CORE_WAV_RESOURCE 256
+
+
+
 #endif

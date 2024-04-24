@@ -5,6 +5,8 @@
 
 
 #pragma comment(lib, "Winmm.lib")
+#pragma comment(lib, "Dsound.lib")
+#pragma comment(lib, "dxguid.lib")
 
 
 
@@ -12,6 +14,8 @@
 #include <WinSock2.h>
 #include <WS2tcpip.h>
 #include <Windows.h>
+#include <dsound.h>
+#include <mmdeviceapi.h>
 
 #include <iostream>
 #include <string>
@@ -64,7 +68,19 @@ namespace AuroraCore
 	namespace Sound
 	{
 
+		struct CPUBuffer;
 
+		struct Device;
+
+		class Context;
+
+		class Buffer;
+
+		class Buffer3D;
+
+		class Source;
+
+		class Source3D;
 
 	}
 

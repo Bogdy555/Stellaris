@@ -7,6 +7,7 @@
 #pragma comment(lib, "Winmm.lib")
 #pragma comment(lib, "Dsound.lib")
 #pragma comment(lib, "dxguid.lib")
+#pragma comment(lib, "Xinput9_1_0.lib")
 
 
 
@@ -16,6 +17,7 @@
 #include <Windows.h>
 #include <dsound.h>
 #include <mmdeviceapi.h>
+#include <Xinput.h>
 
 #include <iostream>
 #include <string>
@@ -111,7 +113,12 @@ namespace AuroraCore
 	namespace Input
 	{
 
+		namespace Controller
+		{
 
+			struct State;
+
+		}
 
 	}
 

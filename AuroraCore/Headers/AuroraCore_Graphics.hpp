@@ -448,8 +448,9 @@ namespace AuroraCore
 			struct MaterialStruct
 			{
 				int TextureAlbedo = 0;
+				Math::Vec4f Color = Math::Vec4f(1.0f, 1.0f, 1.0f, 1.0f);
 				Math::Vec2f Start = Math::Vec2f(0.0f, 0.0f);
-				Math::Vec2f Size = Math::Vec2f(0.0f, 0.0f);
+				Math::Vec2f Size = Math::Vec2f(1.0f, 1.0f);
 			};
 
 			const std::string GetUniformIndexName(const std::string _Name, const size_t _Index);

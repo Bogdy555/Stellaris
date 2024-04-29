@@ -90,6 +90,10 @@ bool AuroraCore::Graphics::Assets::Image::Load(const wchar_t* _Path)
 
 const bool AuroraCore::Graphics::Assets::Image::Save(const wchar_t* _Path) const
 {
+	if (!Data || !Width || !Height || ChannelsCount != 4)
+	{
+		return false;
+	}
 
 	uint8_t* NewData;
 	NewData = new uint8_t[Width * Height * ChannelsCount];
@@ -1583,18 +1587,22 @@ bool AuroraCore::Graphics::GL::UniformSetMaterial(const MaterialStruct& _Materia
 	}
 
 	GL::Uniform u_MaterialTextureAlbedo;
+	GL::Uniform u_MaterialColor;
 	GL::Uniform u_MaterialStart;
 	GL::Uniform u_MaterialSize;
 
 	u_MaterialTextureAlbedo.GetLocation(_Shader, (std::string(_Name) + std::string(".TextureAlbedo")).c_str());
+	u_MaterialColor.GetLocation(_Shader, (std::string(_Name) + std::string(".Color")).c_str());
 	u_MaterialStart.GetLocation(_Shader, (std::string(_Name) + std::string(".Start")).c_str());
 	u_MaterialSize.GetLocation(_Shader, (std::string(_Name) + std::string(".Size")).c_str());
 
 	u_MaterialTextureAlbedo.Set1i(_Material.TextureAlbedo);
+	u_MaterialColor.Set4f(_Material.Color.x, _Material.Color.y, _Material.Color.z, _Material.Color.w);
 	u_MaterialStart.Set2f(_Material.Start.x, _Material.Start.y);
 	u_MaterialSize.Set2f(_Material.Size.x, _Material.Size.y);
 
 	u_MaterialTextureAlbedo.ReleaseLocation();
+	u_MaterialColor.ReleaseLocation();
 	u_MaterialStart.ReleaseLocation();
 	u_MaterialSize.ReleaseLocation();
 

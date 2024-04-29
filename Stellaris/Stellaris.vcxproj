@@ -208,6 +208,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="Cmd Batches\Stellaris_Sign.bat" />
+    <None Include="Files\Shaders\DefaultFragmentShader.glsl" />
+    <None Include="Files\Shaders\DefaultVertexShader.glsl" />
     <None Include="Resources\Stellaris_EnglishUS.rc2" />
   </ItemGroup>
   <ItemGroup>

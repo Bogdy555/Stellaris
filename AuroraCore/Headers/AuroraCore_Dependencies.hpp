@@ -6,6 +6,9 @@
 
 #pragma comment(lib, "Winmm.lib")
 #pragma comment(lib, "opengl32.lib")
+#pragma comment(lib, "Dsound.lib")
+#pragma comment(lib, "dxguid.lib")
+#pragma comment(lib, "Xinput9_1_0.lib")
 
 
 
@@ -15,6 +18,9 @@
 #include <Windows.h>
 #include <gl\GL.h>
 #include <gl\GLU.h>
+#include <dsound.h>
+#include <mmdeviceapi.h>
+#include <Xinput.h>
 
 #include <iostream>
 #include <string>
@@ -31,10 +37,16 @@
 namespace AuroraCore
 {
 
+	enum States : const size_t
+	{
+		_Previous = 0,
+		_Current = 1
+	};
+
 	namespace Time
 	{
 
-
+		class Timer;
 
 	}
 
@@ -60,14 +72,30 @@ namespace AuroraCore
 	namespace RunTime
 	{
 
+		class Application;
 
+		enum MenuTypes : const uint64_t;
+
+		class Menu;
 
 	}
 
 	namespace Sound
 	{
 
+		struct CPUBuffer;
 
+		struct Device;
+
+		class Context;
+
+		class Buffer;
+
+		class Buffer3D;
+
+		class Source;
+
+		class Source3D;
 
 	}
 
@@ -128,7 +156,12 @@ namespace AuroraCore
 	namespace Input
 	{
 
+		namespace Controller
+		{
 
+			struct State;
+
+		}
 
 	}
 

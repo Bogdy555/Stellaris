@@ -1,3 +1,4 @@
+#include <AuroraCore_Resources.hpp>
 #include "..\Headers\Stellaris_Resources.hpp"
 
 

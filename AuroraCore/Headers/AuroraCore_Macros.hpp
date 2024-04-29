@@ -254,4 +254,12 @@
 
 
 
+#define AURORA_CORE_COM_RELEASE(X) if (X)\
+{\
+	X->Release();\
+	X = nullptr;\
+}
+
+
+
 #endif

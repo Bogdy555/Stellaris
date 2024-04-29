@@ -4,15 +4,7 @@
 
 
 
-#include <cstdint>
 #include "AuroraCore.hpp"
-#include <Windows.h>
-#include <gl\GL.h>
-#include <gl\GLU.h>
-
-
-
-#pragma comment(lib, "opengl32.lib")
 
 
 
@@ -93,6 +85,40 @@ namespace AuroraCore
 
 	namespace Graphics
 	{
+		namespace Assets
+		{
+			class Image
+			{
+			public:
+				Image();
+				Image(const Image& _Other) = delete;
+				Image(Image&& _Other) noexcept;
+				~Image();
+
+				Image& operator= (const Image& _Other) = delete;
+				Image& operator= (Image&& _Other) noexcept;
+
+				bool Create(const size_t _Width, const size_t _Height, const size_t _ChannelsCount);
+				bool Load(const wchar_t* _Path);
+				const bool Save(const wchar_t* _Path) const;
+				void Destroy();
+
+				const size_t GetWidth() const;
+				const size_t GetHeight() const;
+				const size_t GetChannelsCount() const;
+				uint8_t* GetData();
+				const uint8_t* GetData() const;
+
+				uint8_t& operator[] (const size_t _Index);
+				const uint8_t& operator[] (const size_t _Index) const;
+
+			private:
+				size_t Width;
+				size_t Height;
+				size_t ChannelsCount;
+				uint8_t* Data;
+			};
+		}
 
 		namespace GL
 		{
@@ -162,41 +188,279 @@ namespace AuroraCore
 			bool Load();
 			void Unload();
 
-		}
-
-		namespace Assets
-		{
-			class Image
+			class Context
 			{
+
 			public:
-				Image();
-				Image(const Image& _Other) = delete;
-				Image(Image&& _Other) noexcept;
-				~Image();
 
-				Image& operator= (const Image& _Other) = delete;
-				Image& operator= (Image&& _Other) noexcept;
+				Context();
+				Context(const Context& _Other) = delete;
+				Context(Context&& _Other) noexcept;
+				~Context();
 
-				bool Create(const size_t _Width, const size_t _Height, const size_t _ChannelsCount);
-				bool Load(const wchar_t* _Path);
-				const bool Save(const wchar_t* _Path) const;
+				bool Create(Window& _WndPtr);
 				void Destroy();
+				bool Bind();
 
-				const size_t GetWidth() const;
-				const size_t GetHeight() const;
-				const size_t GetChannelsCount() const;
-				uint8_t* GetData();
-				const uint8_t* GetData() const;
+				const HGLRC GetHandle() const;
 
-				uint8_t& operator[] (const size_t _Index);
-				const uint8_t& operator[] (const size_t _Index) const;
+				Window* GetWndPtr();
+				const Window* GetWndPtr() const;
+
+				operator const HGLRC() const;
+
+				void operator= (const Context& _Other) = delete;
+				void operator= (Context&& _Other) noexcept;
+
+				static void Unbind();
 
 			private:
-				size_t Width;
-				size_t Height;
-				size_t ChannelsCount;
-				uint8_t* Data;
+
+				HGLRC Handle;
+				Window* WndPtr;
+
 			};
+
+			struct VertexData
+			{
+				Math::Vec3f Position = Math::Vec3f(0.0f, 0.0f, 0.0f);
+				Math::Vec4f Color = Math::Vec4f(1.0f, 1.0f, 1.0f, 1.0f);
+				Math::Vec2f TextureCoords = Math::Vec2f(0.0f, 0.0f);
+			};
+
+			typedef std::vector<VertexData> VertexBufferCPUCash;
+
+			class VertexBuffer
+			{
+
+			public:
+
+				VertexBuffer();
+				VertexBuffer(const VertexBuffer& _Other) = delete;
+				VertexBuffer(VertexBuffer&& _Other) noexcept;
+				~VertexBuffer();
+
+				bool Create(const VertexBufferCPUCash& _VBO_CPUCash);
+				void Destroy();
+				bool Bind();
+
+				const bool CheckCreated() const;
+				const unsigned int GetID() const;
+
+				void operator= (const VertexBuffer& _Other) = delete;
+				void operator= (VertexBuffer&& _Other) noexcept;
+
+				static void Unbind();
+
+			private:
+
+				unsigned int ID;
+
+			};
+
+			typedef std::vector<unsigned int> IndexBufferCPUCash;
+
+			class IndexBuffer
+			{
+
+			public:
+
+				IndexBuffer();
+				IndexBuffer(const IndexBuffer& _Other) = delete;
+				IndexBuffer(IndexBuffer&& _Other) noexcept;
+				~IndexBuffer();
+
+				bool Create(const IndexBufferCPUCash& _IBO_CPUCash);
+				void Destroy();
+				bool Bind();
+
+				const bool CheckCreated() const;
+				const unsigned int GetID() const;
+
+				void operator= (const IndexBuffer& _Other) = delete;
+				void operator= (IndexBuffer&& _Other) noexcept;
+
+				static void Unbind();
+
+			private:
+
+				unsigned int ID;
+
+			};
+
+			struct MeshCPUCash
+			{
+				VertexBufferCPUCash VBO;
+				IndexBufferCPUCash IBO;
+			};
+
+			struct Mesh
+			{
+				VertexBuffer VBO;
+				IndexBuffer IBO;
+			};
+
+			class VertexAttribArray
+			{
+
+			public:
+
+				VertexAttribArray();
+				VertexAttribArray(const VertexAttribArray& _Other) = delete;
+				VertexAttribArray(VertexAttribArray&& _Other) noexcept;
+				~VertexAttribArray();
+
+				bool Create();
+				void Destroy();
+				bool Bind();
+				bool EnableAttrib(unsigned int _AttribID, int _ElementsCount, int _ElementsCountTotal, size_t _Offset);
+				bool DisableAttrib(unsigned int _AttribID);
+
+				const bool CheckCreated() const;
+				const unsigned int GetID() const;
+
+				void operator= (const VertexAttribArray& _Other) = delete;
+				void operator= (VertexAttribArray&& _Other) noexcept;
+
+				static void Unbind();
+
+			private:
+
+				unsigned int ID;
+
+			};
+
+			class Shader
+			{
+
+			public:
+
+				Shader();
+				Shader(const Shader& _Other) = delete;
+				Shader(Shader&& _Other) noexcept;
+				~Shader();
+
+				bool Create(const char* _VS, const char* _FS);
+				void Destroy();
+				bool Bind();
+
+				const bool CheckCreated() const;
+				const unsigned int GetID() const;
+
+				void operator= (const Shader& _Other) = delete;
+				void operator= (Shader&& _Other) noexcept;
+
+				static void Unbind();
+
+			private:
+
+				unsigned int ID;
+
+			};
+
+			class Uniform
+			{
+
+			public:
+
+				Uniform();
+				Uniform(const Uniform& _Other) = delete;
+				Uniform(Uniform&& _Other) noexcept;
+				~Uniform();
+
+				bool GetLocation(const Shader& _Shader, const char* _Name);
+				void ReleaseLocation();
+
+				const bool CheckBind() const;
+				const int GetID() const;
+
+				bool Set1f(float _x);
+				bool Set2f(float _x, float _y);
+				bool Set3f(float _x, float _y, float _z);
+				bool Set4f(float _x, float _y, float _z, float _w);
+
+				bool Set1i(int _x);
+				bool Set2i(int _x, int _y);
+				bool Set3i(int _x, int _y, int _z);
+				bool Set4i(int _x, int _y, int _z, int _w);
+
+				bool Set1b(bool _Value);
+
+				bool Set1ui(unsigned int _Value);
+
+				bool SetMatrix2fv(float* _Data);
+				bool SetMatrix3fv(float* _Data);
+				bool SetMatrix4fv(float* _Data);
+
+				void operator= (const Uniform& _Other) = delete;
+				void operator= (Uniform&& _Other) noexcept;
+
+			private:
+
+				int ID;
+
+			};
+
+			class Texture2D
+			{
+
+			public:
+
+				Texture2D();
+				Texture2D(const Texture2D& _Other) = delete;
+				Texture2D(Texture2D&& _Other) noexcept;
+				~Texture2D();
+
+				bool Create(const Assets::Image& _TexData);
+				void Destroy();
+				bool Bind();
+
+				const bool CheckCreated() const;
+				const unsigned int GetID() const;
+
+				void operator= (const Texture2D& _Other) = delete;
+				void operator= (Texture2D&& _Other) noexcept;
+
+				static void Unbind();
+
+			private:
+
+				unsigned int ID;
+
+			};
+
+			struct CameraStruct
+			{
+				Math::Vec2f Position = Math::Vec2f(0.0f, 0.0f);
+				float Angle = 0.0f;
+				float Fov = 10.0f;
+				float ZNear = -1.0f;
+				float ZFar = 1.0f;
+			};
+
+			struct MeshWorldDataStruct
+			{
+				Math::Vec3f Position = Math::Vec3f(0.0f, 0.0f, 0.0f);
+				float Angle = 0.0f;
+				Math::Vec2f Scale = Math::Vec2f(1.0f, 1.0f);
+			};
+
+			struct MaterialStruct
+			{
+				int TextureAlbedo = 0;
+				Math::Vec2f Start = Math::Vec2f(0.0f, 0.0f);
+				Math::Vec2f Size = Math::Vec2f(0.0f, 0.0f);
+			};
+
+			const std::string GetUniformIndexName(const std::string _Name, const size_t _Index);
+			bool UniformSetCamera(const CameraStruct& _Camera, const Shader& _Shader, const char* _Name);
+			bool UniformSetMeshWorldData(const MeshWorldDataStruct& _MeshWorldData, const Shader& _Shader, const char* _Name);
+			bool UniformSetMaterial(const MaterialStruct& _Material, const Shader& _Shader, const char* _Name);
+
+			Math::Mat4f GetProjectionFromCamera(const CameraStruct& _CameraStr, const float _AspectRatio);
+			Math::Mat4f GetViewFromCamera(const CameraStruct& _CameraStr);
+			Math::Mat4f GetModelFromWorldData(const MeshWorldDataStruct& _WorldData);
+
 		}
 
 	}

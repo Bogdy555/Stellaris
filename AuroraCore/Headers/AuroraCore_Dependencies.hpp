@@ -5,6 +5,7 @@
 
 
 #pragma comment(lib, "Winmm.lib")
+#pragma comment(lib, "opengl32.lib")
 #pragma comment(lib, "Dsound.lib")
 #pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "Xinput9_1_0.lib")
@@ -15,6 +16,8 @@
 #include <WinSock2.h>
 #include <WS2tcpip.h>
 #include <Windows.h>
+#include <gl\GL.h>
+#include <gl\GLU.h>
 #include <dsound.h>
 #include <mmdeviceapi.h>
 #include <Xinput.h>
@@ -99,7 +102,47 @@ namespace AuroraCore
 	namespace Graphics
 	{
 
+		namespace Assets
+		{
 
+			class Image;
+
+		}
+
+		namespace GL
+		{
+
+			class Context;
+
+			struct VertexData;
+
+			typedef std::vector<VertexData> VertexBufferCPUCash;
+
+			class VertexBuffer;
+
+			typedef std::vector<unsigned int> IndexBufferCPUCash;
+
+			class IndexBuffer;
+
+			struct MeshCPUCash;
+
+			struct Mesh;
+
+			class VertexAttribArray;
+
+			class Shader;
+
+			class Uniform;
+
+			class Texture2D;
+
+			struct CameraStruct;
+
+			struct MeshWorldDataStruct;
+
+			struct MaterialStruct;
+
+		}
 
 	}
 

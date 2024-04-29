@@ -21,8 +21,6 @@
     <None Include="Resources\Stellaris_EnglishUS.rc2">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="Files\Shaders\DefaultFragmentShader.glsl" />
-    <None Include="Files\Shaders\DefaultVertexShader.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Headers\Stellaris.hpp">

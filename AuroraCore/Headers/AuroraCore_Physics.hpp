@@ -39,7 +39,7 @@ namespace AuroraCore
 			void Add(const AABB& _Box);
 			void Remove(const size_t _Index);
 			void Clear();
-			const size_t Size();
+			const size_t Size() const;
 			
 			HitBox& operator= (const HitBox& _Other) = delete;
 			HitBox& operator= (HitBox&& _Other) noexcept;

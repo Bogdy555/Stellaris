@@ -32,9 +32,9 @@ AuroraCore::Physics::HitBox::HitBox()
 
 }
 
-AuroraCore::Physics::HitBox::HitBox(HitBox&& _Other) noexcept
+AuroraCore::Physics::HitBox::HitBox(HitBox&& _Other) noexcept : Boxes(std::move(_Other.Boxes))
 {
-	_Other.Clear();
+
 }
 
 AuroraCore::Physics::HitBox::~HitBox()
@@ -73,7 +73,7 @@ void AuroraCore::Physics::HitBox::Clear()
 	Boxes.clear();
 }
 
-const size_t AuroraCore::Physics::HitBox::Size()
+const size_t AuroraCore::Physics::HitBox::Size() const
 {
 	return Boxes.size();
 }

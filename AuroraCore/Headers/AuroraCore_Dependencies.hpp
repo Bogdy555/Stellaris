@@ -96,6 +96,12 @@ namespace AuroraCore
 
 		class HitBox;
 
+		class Entity;
+
+		class DynamicEntity;
+
+		class Scene;
+
 	}
 
 	class Window;

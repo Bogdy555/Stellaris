@@ -41,7 +41,7 @@ namespace AuroraCore
 			void Clear();
 			const size_t Size() const;
 			
-			HitBox& operator= (const HitBox& _Other) = delete;
+			HitBox& operator= (const HitBox& _Other) noexcept;
 			HitBox& operator= (HitBox&& _Other) noexcept;
 			AABB& operator[] (const size_t _Index);
 			const AABB& operator[] (const size_t _Index) const;
@@ -50,6 +50,78 @@ namespace AuroraCore
 
 			std::vector<AABB> Boxes;
 		
+		};
+
+		class Entity
+		{
+
+		public:
+
+			Entity();
+			Entity(const Math::Vec2f& _Position, const HitBox& _Box);
+			virtual ~Entity();
+
+			void SetPosition(Math::Vec2f& _Position);
+			void SetHitBox(HitBox& _Box);
+
+			Math::Vec2f& GetPosition();
+			HitBox& GetBox();
+
+		protected:
+	
+			Math::Vec2f Position;
+			HitBox Box;
+
+		};
+
+		class DynamicEntity : Entity
+		{
+
+		public:
+			
+			DynamicEntity();
+			DynamicEntity(const Math::Vec2f& _Position, const HitBox& _Box);
+			~DynamicEntity();
+
+			void SetLayerResponse(std::vector<bool>& _LayerResponse);
+			void SetVelocity(Math::Vec2f& _Velocity);
+			void SetForce(Math::Vec2f& _Force);
+			void SetMass(float& _Mass);
+			void SetElasticity(Math::Vec2f& _Elasticity);
+
+			std::vector<bool>& GetLayerResponse();
+			Math::Vec2f& GetVelocity();
+			Math::Vec2f& GetForce();
+			float& GetMass();
+			Math::Vec2f& GetElasticity();
+
+		private:
+
+			std::vector<bool> LayerResponse;
+			Math::Vec2f Velocity;
+			Math::Vec2f Force;
+			float Mass;
+			Math::Vec2f Elasticity;
+
+		};
+
+		class Scene
+		{
+
+		public:
+
+			Scene();
+			~Scene();
+			Scene(const Scene& _Other) = delete;
+			Scene(Scene&& _Other) noexcept;
+
+			Scene& operator= (const Scene& _Other) noexcept;
+			Scene& operator= (Scene&& _Other) noexcept;
+
+		private:
+
+			std::vector<std::vector<Entity*>> Entities;
+
 		};
 
 	}

@@ -29,7 +29,7 @@ bool AuroraCore::AssetManager::AddAsset(void* _Data, const wchar_t* _Name)
 
 	for (size_t _Index = 0; _Index < Assets.size(); _Index++)
 	{
-		if (lstrcmpW(_Name, Assets[_Index].Name))
+		if (lstrcmpW(_Name, Assets[_Index].Name) == 0)
 		{
 			return false;
 		}
@@ -58,7 +58,7 @@ void AuroraCore::AssetManager::RemoveAsset(const wchar_t* _Name)
 {
 	for (size_t _Index = 0; _Index < Assets.size(); _Index++)
 	{
-		if (lstrcmpW(_Name, Assets[_Index].Name))
+		if (lstrcmpW(_Name, Assets[_Index].Name) == 0)
 		{
 			delete[] Assets[_Index].Name;
 			Assets.erase(Assets.begin() + _Index);
@@ -91,7 +91,7 @@ const size_t AuroraCore::AssetManager::GetAssetIndex(const wchar_t* _Name) const
 {
 	for (size_t _Index = 0; _Index < Assets.size(); _Index++)
 	{
-		if (lstrcmpW(_Name, Assets[_Index].Name))
+		if (lstrcmpW(_Name, Assets[_Index].Name) == 0)
 		{
 			return _Index;
 		}
@@ -104,7 +104,7 @@ void* AuroraCore::AssetManager::GetAssetData(const wchar_t* _Name)
 {
 	for (size_t _Index = 0; _Index < Assets.size(); _Index++)
 	{
-		if (lstrcmpW(_Name, Assets[_Index].Name))
+		if (lstrcmpW(_Name, Assets[_Index].Name) == 0)
 		{
 			return Assets[_Index].Data;
 		}
@@ -117,7 +117,7 @@ const void* AuroraCore::AssetManager::GetAssetData(const wchar_t* _Name) const
 {
 	for (size_t _Index = 0; _Index < Assets.size(); _Index++)
 	{
-		if (lstrcmpW(_Name, Assets[_Index].Name))
+		if (lstrcmpW(_Name, Assets[_Index].Name) == 0)
 		{
 			return Assets[_Index].Data;
 		}

@@ -12,6 +12,8 @@
 
 #include "AuroraCore_Math.hpp"
 
+#include "AuroraCore_AssetManager.hpp"
+
 #include "AuroraCore_RunTime.hpp"
 
 #include "AuroraCore_Sound.hpp"

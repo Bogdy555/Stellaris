@@ -69,6 +69,10 @@ namespace AuroraCore
 
 	}
 
+	struct Asset;
+
+	class AssetManager;
+
 	namespace RunTime
 	{
 

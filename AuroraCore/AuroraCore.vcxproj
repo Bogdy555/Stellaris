@@ -160,6 +160,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Headers\AuroraCore.hpp" />
+    <ClInclude Include="Headers\AuroraCore_AssetManager.hpp" />
     <ClInclude Include="Headers\AuroraCore_Dependencies.hpp" />
     <ClInclude Include="Headers\AuroraCore_Graphics.hpp" />
     <ClInclude Include="Headers\AuroraCore_Input.hpp" />
@@ -176,6 +177,7 @@
     <ClInclude Include="Headers\AuroraCore_WinTargetVer.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Sources\AuroraCore_AssetManager.cpp" />
     <ClCompile Include="Sources\AuroraCore_Graphics.cpp" />
     <ClCompile Include="Sources\AuroraCore_Input.cpp" />
     <ClCompile Include="Sources\AuroraCore_Math.cpp" />

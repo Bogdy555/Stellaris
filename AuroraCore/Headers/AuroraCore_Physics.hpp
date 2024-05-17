@@ -35,6 +35,7 @@ namespace AuroraCore
 			~HitBox();
 
 			static const bool CheckCollision(const HitBox& _HitBox1, const HitBox& _HitBox2, const Math::Vec2f& _Entity1Position, const Math::Vec2f& _Entity2Position);
+			
 
 			void Add(const AABB& _Box);
 			void Remove(const size_t _Index);
@@ -62,6 +63,8 @@ namespace AuroraCore
 			virtual ~Entity();
 
 			void SetPosition(Math::Vec2f& _Position);
+			void SetXPosition(float _x);
+			void SetYPosition(float _y);
 			void SetHitBox(HitBox& _Box);
 
 			Math::Vec2f& GetPosition();
@@ -74,7 +77,7 @@ namespace AuroraCore
 
 		};
 
-		class DynamicEntity : Entity
+		class DynamicEntity : public Entity
 		{
 
 		public:
@@ -85,11 +88,18 @@ namespace AuroraCore
 
 			void SetLayerResponse(std::vector<bool>& _LayerResponse);
 			void SetVelocity(Math::Vec2f& _Velocity);
+			void SetXVelocity(float _Velocity);
+			void SetYVelocity(float _Velocity);
 			void SetForce(Math::Vec2f& _Force);
-			void SetMass(float& _Mass);
+			void SetXForce(float _Force);
+			void SetYForce(float _Force);
+			void SetMass(float _Mass);
 			void SetElasticity(Math::Vec2f& _Elasticity);
-
-			std::vector<bool>& GetLayerResponse();
+			void SetXElasticity(float _Elasticity);
+			void SetYElasticity(float _Elasticity);
+			
+			std::vector<bool>& GetLayerResponseVec();
+			const bool& GetLayerResponse(const size_t& _Index);
 			Math::Vec2f& GetVelocity();
 			Math::Vec2f& GetForce();
 			float& GetMass();
@@ -111,9 +121,13 @@ namespace AuroraCore
 		public:
 
 			Scene();
-			~Scene();
 			Scene(const Scene& _Other) = delete;
 			Scene(Scene&& _Other) noexcept;
+			~Scene();
+
+			void AddEntity(const size_t _LayerIndex, Entity* _Entity);
+			void RemoveEntity(const size_t _LayerIndex, const size_t _EntityIndex);
+			void Update(float& _DeltaTime, void (*_CallBack)(Entity* _Entity1, Entity* _Entity2) = nullptr);
 
 			Scene& operator= (const Scene& _Other) noexcept;
 			Scene& operator= (Scene&& _Other) noexcept;

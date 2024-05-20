@@ -94,7 +94,7 @@ namespace AuroraCore
 
 		struct AABB;
 
-		class HitBox;
+		struct HitBox;
 
 		class Entity;
 

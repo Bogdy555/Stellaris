@@ -17,40 +17,19 @@ namespace AuroraCore
 		struct AABB
 		{
 
-			Math::Vec2f Position;
-			Math::Vec2f Size;
+			float X = -0.5f, Y = -0.5f, Width = 1.0f, Height = 1.0f;
 
-			static const bool CheckCollision(const AABB& _Box1, const AABB& _Box2, const Math::Vec2f& Item1Position, const Math::Vec2f& Item2Position);
+			static const bool CheckCollision(const AABB& _Box1, const AABB& _Box2, const Math::Vec2f& _Position1, const Math::Vec2f& _Position2);
 
 		};
 
-		class HitBox
+		struct HitBox
 		{
 
-		public:
-
-			HitBox();
-			HitBox(const HitBox& _Other) = delete;
-			HitBox(HitBox&& _Other) noexcept;
-			~HitBox();
-
-			static const bool CheckCollision(const HitBox& _HitBox1, const HitBox& _HitBox2, const Math::Vec2f& _Entity1Position, const Math::Vec2f& _Entity2Position);
-			
-
-			void Add(const AABB& _Box);
-			void Remove(const size_t _Index);
-			void Clear();
-			const size_t Size() const;
-			
-			HitBox& operator= (const HitBox& _Other) noexcept;
-			HitBox& operator= (HitBox&& _Other) noexcept;
-			AABB& operator[] (const size_t _Index);
-			const AABB& operator[] (const size_t _Index) const;
-		
-		private:
-
 			std::vector<AABB> Boxes;
-		
+
+			static const bool CheckCollision(const HitBox& _Box1, const HitBox& _Box2, const Math::Vec2f& _Position1, const Math::Vec2f& _Position2);
+
 		};
 
 		class Entity
@@ -62,16 +41,6 @@ namespace AuroraCore
 			Entity(const Math::Vec2f& _Position, const HitBox& _Box);
 			virtual ~Entity();
 
-			void SetPosition(Math::Vec2f& _Position);
-			void SetXPosition(float _x);
-			void SetYPosition(float _y);
-			void SetHitBox(HitBox& _Box);
-
-			Math::Vec2f& GetPosition();
-			HitBox& GetBox();
-
-		protected:
-	
 			Math::Vec2f Position;
 			HitBox Box;
 
@@ -81,37 +50,18 @@ namespace AuroraCore
 		{
 
 		public:
-			
+
 			DynamicEntity();
-			DynamicEntity(const Math::Vec2f& _Position, const HitBox& _Box);
+			DynamicEntity(const Math::Vec2f& _Position, const HitBox& _Box, const std::vector<bool>& _LayerResponse, const Math::Vec2f& _Velocity, const Math::Vec2f& _Force, const float _Mass, const Math::Vec2f& _Elasticity, const Math::Vec2f& _Drag, const Math::Vec2f& _GravitationalAcceleration);
 			~DynamicEntity();
-
-			void SetLayerResponse(std::vector<bool>& _LayerResponse);
-			void SetVelocity(Math::Vec2f& _Velocity);
-			void SetXVelocity(float _Velocity);
-			void SetYVelocity(float _Velocity);
-			void SetForce(Math::Vec2f& _Force);
-			void SetXForce(float _Force);
-			void SetYForce(float _Force);
-			void SetMass(float _Mass);
-			void SetElasticity(Math::Vec2f& _Elasticity);
-			void SetXElasticity(float _Elasticity);
-			void SetYElasticity(float _Elasticity);
-			
-			std::vector<bool>& GetLayerResponseVec();
-			const bool& GetLayerResponse(const size_t& _Index);
-			Math::Vec2f& GetVelocity();
-			Math::Vec2f& GetForce();
-			float& GetMass();
-			Math::Vec2f& GetElasticity();
-
-		private:
 
 			std::vector<bool> LayerResponse;
 			Math::Vec2f Velocity;
 			Math::Vec2f Force;
 			float Mass;
 			Math::Vec2f Elasticity;
+			Math::Vec2f Drag;
+			Math::Vec2f GravitationalAcceleration;
 
 		};
 
@@ -120,23 +70,16 @@ namespace AuroraCore
 
 		public:
 
-			Scene();
-			Scene(const Scene& _Other) = delete;
-			Scene(Scene&& _Other) noexcept;
-			~Scene();
+			std::vector<std::vector<Entity*>> Layers;
+			void (*CallBack)(Entity& _Entity1, Entity& _Entity2) = nullptr;
 
-			void AddEntity(const size_t _LayerIndex, Entity* _Entity);
-			void RemoveEntity(const size_t _LayerIndex, const size_t _EntityIndex);
-			void Update(float& _DeltaTime, void (*_CallBack)(Entity* _Entity1, Entity* _Entity2) = nullptr);
-
-			Scene& operator= (const Scene& _Other) noexcept;
-			Scene& operator= (Scene&& _Other) noexcept;
-
-		private:
-
-			std::vector<std::vector<Entity*>> Entities;
+			void Update(const float _DeltaTime);
 
 		};
+
+		const float ResolveCollision(const float _Start1, const float _Width1, const float _Start2, const float _Width2, const bool _Increas);
+		const float ComputeMaxDecelerationForce(const float _Force, const float _Velocity, const float _Mass, const float _DeltaTime);
+		const float ComputeMaxAccelerationForce(const float _MaxVelocity, const float _Force, const float _Velocity, const float _Mass, const float _DeltaTime);
 
 	}
 

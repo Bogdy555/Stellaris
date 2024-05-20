@@ -172,7 +172,15 @@ namespace AuroraCore
 	namespace Physics
 	{
 
+		struct AABB;
 
+		struct HitBox;
+
+		class Entity;
+
+		class DynamicEntity;
+
+		class Scene;
 
 	}
 

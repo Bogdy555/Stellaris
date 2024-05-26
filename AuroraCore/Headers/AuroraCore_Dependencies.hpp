@@ -9,6 +9,7 @@
 #pragma comment(lib, "Dsound.lib")
 #pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "Xinput9_1_0.lib")
+#pragma comment(lib, "Ws2_32.lib")
 
 
 
@@ -23,6 +24,7 @@
 #include <Xinput.h>
 
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <chrono>
 #include <thread>

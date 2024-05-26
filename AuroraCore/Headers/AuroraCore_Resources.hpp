@@ -95,6 +95,8 @@
 
 #define AURORA_CORE_WAV_RESOURCE 256
 
+#define AURORA_CORE_GLSL_RESOURCE 257
+
 
 
 #endif

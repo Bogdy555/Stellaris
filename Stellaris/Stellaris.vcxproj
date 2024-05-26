@@ -208,16 +208,27 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="Cmd Batches\Stellaris_Sign.bat" />
+    <None Include="Resources\Shaders\Stellaris_DefaultFragmentShader.glsl" />
+    <None Include="Resources\Shaders\Stellaris_DefaultVertexShader.glsl" />
     <None Include="Resources\Stellaris_EnglishUS.rc2" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Headers\Stellaris.hpp" />
+    <ClInclude Include="Headers\Stellaris_Application.hpp" />
     <ClInclude Include="Headers\Stellaris_Dependencies.hpp" />
     <ClInclude Include="Headers\Stellaris_Macros.hpp" />
+    <ClInclude Include="Headers\Stellaris_PlayMenu.hpp" />
     <ClInclude Include="Headers\Stellaris_Resources.hpp" />
+    <ClInclude Include="Headers\Stellaris_RestartMenu.hpp" />
+    <ClInclude Include="Headers\Stellaris_StartMenu.hpp" />
     <ClInclude Include="Headers\Stellaris_Templates.hpp" />
+    <ClInclude Include="Headers\Stellaris_Window.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Files\Map.bmp" />
+    <Image Include="Files\Sprites\Background.bmp" />
+    <Image Include="Files\Sprites\Characters.bmp" />
+    <Image Include="Files\Sprites\Sprites.bmp" />
     <Image Include="Resources\Icons\Stellaris_MainIcon.ico" />
   </ItemGroup>
   <ItemGroup>
@@ -227,7 +238,16 @@
     <ResourceCompile Include="Resources\Stellaris_Resources.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Sources\Stellaris_Application.cpp" />
     <ClCompile Include="Sources\Stellaris_EntryPoint.cpp" />
+    <ClCompile Include="Sources\Stellaris_PlayMenu.cpp" />
+    <ClCompile Include="Sources\Stellaris_RestartMenu.cpp" />
+    <ClCompile Include="Sources\Stellaris_StartMenu.cpp" />
+    <ClCompile Include="Sources\Stellaris_Window.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="Files\Sound\Background.wav" />
+    <Media Include="Files\Sound\Collect SFX.wav" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

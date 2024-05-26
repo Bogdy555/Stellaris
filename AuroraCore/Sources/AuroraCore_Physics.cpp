@@ -173,6 +173,8 @@ void AuroraCore::Physics::Scene::Update(const float _DeltaTime)
 					{
 						DynamicEntity& _CollisionEntity = *(DynamicEntity*)(Layers[_LayerIndex2][_EntityIndex2]);
 
+						bool _FoundCollision = false;
+
 						for (size_t _BoxIndex1 = 0; _BoxIndex1 < _Entity.Box.Boxes.size(); _BoxIndex1++)
 						{
 							const AABB& _Box1 = _Entity.Box.Boxes[_BoxIndex1];
@@ -195,17 +197,21 @@ void AuroraCore::Physics::Scene::Update(const float _DeltaTime)
 										_CollisionEntity.Velocity.y = Math::Mix(_V0Plastic, _V2Elastic, _Entity.Elasticity.y * 0.5f + _CollisionEntity.Elasticity.y * 0.5f);
 									}
 
-									if (CallBack)
-									{
-										CallBack(_Entity, _CollisionEntity);
-									}
+									_FoundCollision = true;
 								}
 							}
+						}
+
+						if (_FoundCollision && CallBack)
+						{
+							CallBack(_Entity, _CollisionEntity);
 						}
 					}
 					else
 					{
 						Entity& _CollisionEntity = *Layers[_LayerIndex2][_EntityIndex2];
+
+						bool _FoundCollision = false;
 
 						for (size_t _BoxIndex1 = 0; _BoxIndex1 < _Entity.Box.Boxes.size(); _BoxIndex1++)
 						{
@@ -220,12 +226,14 @@ void AuroraCore::Physics::Scene::Update(const float _DeltaTime)
 									_Entity.Position.y += ResolveCollision(_Box1.Y + _Entity.Position.y, _Box1.Height, _Box2.Y + _CollisionEntity.Position.y, _Box2.Height, _Entity.Velocity.y <= 0);
 									_Entity.Velocity.y = -_Entity.Velocity.y * _Entity.Elasticity.y;
 
-									if (CallBack)
-									{
-										CallBack(_Entity, _CollisionEntity);
-									}
+									_FoundCollision = true;
 								}
 							}
+						}
+
+						if (_FoundCollision && CallBack)
+						{
+							CallBack(_Entity, _CollisionEntity);
 						}
 					}
 				}
@@ -249,6 +257,8 @@ void AuroraCore::Physics::Scene::Update(const float _DeltaTime)
 					{
 						DynamicEntity& _CollisionEntity = *(DynamicEntity*)(Layers[_LayerIndex2][_EntityIndex2]);
 
+						bool _FoundCollision = false;
+
 						for (size_t _BoxIndex1 = 0; _BoxIndex1 < _Entity.Box.Boxes.size(); _BoxIndex1++)
 						{
 							const AABB& _Box1 = _Entity.Box.Boxes[_BoxIndex1];
@@ -268,17 +278,21 @@ void AuroraCore::Physics::Scene::Update(const float _DeltaTime)
 										_CollisionEntity.Velocity.y = Math::Mix(_VPlastic, _VElastic, _CollisionEntity.Elasticity.y);
 									}
 
-									if (CallBack)
-									{
-										CallBack(_Entity, _CollisionEntity);
-									}
+									_FoundCollision = true;
 								}
 							}
+						}
+
+						if (_FoundCollision && CallBack)
+						{
+							CallBack(_Entity, _CollisionEntity);
 						}
 					}
 					else
 					{
 						Entity& _CollisionEntity = *Layers[_LayerIndex2][_EntityIndex2];
+
+						bool _FoundCollision = false;
 
 						for (size_t _BoxIndex1 = 0; _BoxIndex1 < _Entity.Box.Boxes.size(); _BoxIndex1++)
 						{
@@ -290,12 +304,14 @@ void AuroraCore::Physics::Scene::Update(const float _DeltaTime)
 
 								if (AABB::CheckCollision(_Box1, _Box2, _Entity.Position, _CollisionEntity.Position))
 								{
-									if (CallBack)
-									{
-										CallBack(_Entity, _CollisionEntity);
-									}
+									_FoundCollision = true;
 								}
 							}
+						}
+
+						if (_FoundCollision && CallBack)
+						{
+							CallBack(_Entity, _CollisionEntity);
 						}
 					}
 				}
@@ -323,6 +339,8 @@ void AuroraCore::Physics::Scene::Update(const float _DeltaTime)
 					{
 						DynamicEntity& _CollisionEntity = *(DynamicEntity*)(Layers[_LayerIndex2][_EntityIndex2]);
 
+						bool _FoundCollision = false;
+
 						for (size_t _BoxIndex1 = 0; _BoxIndex1 < _Entity.Box.Boxes.size(); _BoxIndex1++)
 						{
 							const AABB& _Box1 = _Entity.Box.Boxes[_BoxIndex1];
@@ -345,17 +363,21 @@ void AuroraCore::Physics::Scene::Update(const float _DeltaTime)
 										_CollisionEntity.Velocity.x = Math::Mix(_V0Plastic, _V2Elastic, _Entity.Elasticity.x * 0.5f + _CollisionEntity.Elasticity.x * 0.5f);
 									}
 
-									if (CallBack)
-									{
-										CallBack(_Entity, _CollisionEntity);
-									}
+									_FoundCollision = true;
 								}
 							}
+						}
+
+						if (_FoundCollision && CallBack)
+						{
+							CallBack(_Entity, _CollisionEntity);
 						}
 					}
 					else
 					{
 						Entity& _CollisionEntity = *Layers[_LayerIndex2][_EntityIndex2];
+
+						bool _FoundCollision = false;
 
 						for (size_t _BoxIndex1 = 0; _BoxIndex1 < _Entity.Box.Boxes.size(); _BoxIndex1++)
 						{
@@ -370,12 +392,14 @@ void AuroraCore::Physics::Scene::Update(const float _DeltaTime)
 									_Entity.Position.x += ResolveCollision(_Box1.X + _Entity.Position.x, _Box1.Width, _Box2.X + _CollisionEntity.Position.x, _Box2.Width, _Entity.Velocity.x <= 0);
 									_Entity.Velocity.x = -_Entity.Velocity.x * _Entity.Elasticity.x;
 
-									if (CallBack)
-									{
-										CallBack(_Entity, _CollisionEntity);
-									}
+									_FoundCollision = true;
 								}
 							}
+						}
+
+						if (_FoundCollision && CallBack)
+						{
+							CallBack(_Entity, _CollisionEntity);
 						}
 					}
 				}
@@ -399,6 +423,8 @@ void AuroraCore::Physics::Scene::Update(const float _DeltaTime)
 					{
 						DynamicEntity& _CollisionEntity = *(DynamicEntity*)(Layers[_LayerIndex2][_EntityIndex2]);
 
+						bool _FoundCollision = false;
+
 						for (size_t _BoxIndex1 = 0; _BoxIndex1 < _Entity.Box.Boxes.size(); _BoxIndex1++)
 						{
 							const AABB& _Box1 = _Entity.Box.Boxes[_BoxIndex1];
@@ -418,17 +444,21 @@ void AuroraCore::Physics::Scene::Update(const float _DeltaTime)
 										_CollisionEntity.Velocity.x = Math::Mix(_VPlastic, _VElastic, _CollisionEntity.Elasticity.x);
 									}
 
-									if (CallBack)
-									{
-										CallBack(_Entity, _CollisionEntity);
-									}
+									_FoundCollision = true;
 								}
 							}
+						}
+
+						if (_FoundCollision && CallBack)
+						{
+							CallBack(_Entity, _CollisionEntity);
 						}
 					}
 					else
 					{
 						Entity& _CollisionEntity = *Layers[_LayerIndex2][_EntityIndex2];
+
+						bool _FoundCollision = false;
 
 						for (size_t _BoxIndex1 = 0; _BoxIndex1 < _Entity.Box.Boxes.size(); _BoxIndex1++)
 						{
@@ -440,12 +470,14 @@ void AuroraCore::Physics::Scene::Update(const float _DeltaTime)
 
 								if (AABB::CheckCollision(_Box1, _Box2, _Entity.Position, _CollisionEntity.Position))
 								{
-									if (CallBack)
-									{
-										CallBack(_Entity, _CollisionEntity);
-									}
+									_FoundCollision = true;
 								}
 							}
+						}
+
+						if (_FoundCollision && CallBack)
+						{
+							CallBack(_Entity, _CollisionEntity);
 						}
 					}
 				}

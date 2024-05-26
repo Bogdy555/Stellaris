@@ -83,6 +83,14 @@ bool AuroraCore::Graphics::Assets::Image::Load(const wchar_t* _Path)
 		}
 	}
 
+	for (size_t y = 0; y < Height; y++)
+	{
+		for (size_t x = 0; x < Width; x++)
+		{
+			Data[(x + y * Width) * ChannelsCount + 3] = 255;
+		}
+	}
+
 	DeleteObject(_HBitMap);
 
 	return true;

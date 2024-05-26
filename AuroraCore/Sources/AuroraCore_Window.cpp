@@ -340,11 +340,6 @@ void AuroraCore::Window::WndThreadFnc(bool& _Done, bool& _Fail, Window* _Wnd, co
 			}
 		}
 
-		if (IsDialogMessage(_Wnd->Handle, &_Msg))
-		{
-			continue;
-		}
-
 		TranslateMessage(&_Msg);
 		DispatchMessage(&_Msg);
 	}

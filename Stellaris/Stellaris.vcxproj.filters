@@ -21,6 +21,8 @@
     <None Include="Resources\Stellaris_EnglishUS.rc2">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="Resources\Shaders\Stellaris_DefaultFragmentShader.glsl" />
+    <None Include="Resources\Shaders\Stellaris_DefaultVertexShader.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Headers\Stellaris.hpp">
@@ -38,9 +40,36 @@
     <ClInclude Include="Headers\Stellaris_Templates.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Headers\Stellaris_Application.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\Stellaris_PlayMenu.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\Stellaris_Window.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\Stellaris_StartMenu.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\Stellaris_RestartMenu.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\Icons\Stellaris_MainIcon.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Files\Sprites\Characters.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Files\Sprites\Background.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Files\Sprites\Sprites.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Files\Map.bmp">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
@@ -56,5 +85,28 @@
     <ClCompile Include="Sources\Stellaris_EntryPoint.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\Stellaris_Application.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Stellaris_PlayMenu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Stellaris_Window.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Stellaris_StartMenu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Stellaris_RestartMenu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="Files\Sound\Background.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="Files\Sound\Collect SFX.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
   </ItemGroup>
 </Project>

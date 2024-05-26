@@ -19,7 +19,32 @@
 namespace Stellaris
 {
 
+	namespace Window
+	{
 
+		struct Data;
+
+	}
+
+	namespace RunTime
+	{
+
+		class Application;
+
+		enum MenuTypes : const uint64_t
+		{
+			_PlayMenu = 1,
+			_StartMenu = 2,
+			_RestartMenu = 3
+		};
+
+		class PlayMenu;
+
+		class StartMenu;
+
+		class RestartMenu;
+
+	}
 
 }
 

@@ -16,4 +16,9 @@ STELLARIS_IDM_MAIN_MANIFEST RT_MANIFEST L".\\Manifests\\Stellaris_MainManifest.m
 
 
 
+STELLARIS_IDS_DEFAULT_VERTEX_SHADER AURORA_CORE_GLSL_RESOURCE L".\\Shaders\\Stellaris_DefaultVertexShader.glsl"
+STELLARIS_IDS_DEFAULT_FRAGMENT_SHADER AURORA_CORE_GLSL_RESOURCE L".\\Shaders\\Stellaris_DefaultFragmentShader.glsl"
+
+
+
 #include "Stellaris_EnglishUS.rc2"

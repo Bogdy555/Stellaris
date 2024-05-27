@@ -1021,7 +1021,7 @@ void Stellaris::RunTime::Application::CleanUpSound()
 
 void Stellaris::RunTime::Application::Setup()
 {
-	srand(time(nullptr));
+	srand((unsigned int)(time(nullptr)));
 
 	if (GetArgC() != 1)
 	{

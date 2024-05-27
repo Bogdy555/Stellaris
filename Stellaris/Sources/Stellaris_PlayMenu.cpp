@@ -436,6 +436,44 @@ void Stellaris::RunTime::PlayMenu::FrameBuild()
 	_Quad.IBO.Bind();
 	_Quad.VBO.Bind();
 
+	AuroraCore::Math::Vec2f _SpritesLookup[] = 
+	{
+		AuroraCore::Math::Vec2f(0.0f / 8.0f, 0.0f / 3.0f),
+		AuroraCore::Math::Vec2f(1.0f / 8.0f, 0.0f / 3.0f),
+		AuroraCore::Math::Vec2f(0.0f / 8.0f, 2.0f / 3.0f),
+		AuroraCore::Math::Vec2f(1.0f / 8.0f, 2.0f / 3.0f),
+		AuroraCore::Math::Vec2f(2.0f / 8.0f, 2.0f / 3.0f),
+		AuroraCore::Math::Vec2f(3.0f / 8.0f, 2.0f / 3.0f),
+		AuroraCore::Math::Vec2f(4.0f / 8.0f, 2.0f / 3.0f),
+		AuroraCore::Math::Vec2f(5.0f / 8.0f, 2.0f / 3.0f),
+		AuroraCore::Math::Vec2f(6.0f / 8.0f, 2.0f / 3.0f),
+		AuroraCore::Math::Vec2f(7.0f / 8.0f, 2.0f / 3.0f)
+	};
+
+	enum SpriteIndexes : const size_t
+	{
+		_GrassSprite = 0,
+		_DirtSprite = 1,
+		_PlayerIdleLeft = 2,
+		_PlayerIdleRight = 3,
+		_PlayerWalkLeft1 = 4,
+		_PlayerWalkLeft2 = 5,
+		_PlayerWalkLeft3 = 6,
+		_PlayerWalkRight1 = 7,
+		_PlayerWalkRight2 = 8,
+		_PlayerWalkRight3 = 9
+	};
+
+	std::vector<AuroraCore::Math::Vec2f> _StarSprites =
+	{
+		AuroraCore::Math::Vec2f(0.0f / 8.0f, 1.0f / 3.0f),
+		AuroraCore::Math::Vec2f(1.0f / 8.0f, 1.0f / 3.0f),
+		AuroraCore::Math::Vec2f(2.0f / 8.0f, 1.0f / 3.0f),
+		AuroraCore::Math::Vec2f(3.0f / 8.0f, 1.0f / 3.0f),
+		AuroraCore::Math::Vec2f(4.0f / 8.0f, 1.0f / 3.0f),
+		AuroraCore::Math::Vec2f(5.0f / 8.0f, 1.0f / 3.0f)
+	};
+
 	{
 		AuroraCore::Graphics::GL::CameraStruct _Camera;
 		_Camera.Fov = 1.0f;
@@ -475,11 +513,11 @@ void Stellaris::RunTime::PlayMenu::FrameBuild()
 
 				if (WorldMatrix[_Y + 1][_X])
 				{
-					_Material.Start = AuroraCore::Math::Vec2f(1.0f / 8.0f, 0.0f / 3.0f);
+					_Material.Start = _SpritesLookup[_DirtSprite];
 				}
 				else
 				{
-					_Material.Start = AuroraCore::Math::Vec2f(0.0f / 8.0f, 0.0f / 3.0f);
+					_Material.Start = _SpritesLookup[_GrassSprite];
 				}
 
 				_Application.RenderSprite((float)(_Width) / (float)(_Height), _Camera, _WorldData, _Material, _DefaultShader);
@@ -500,7 +538,7 @@ void Stellaris::RunTime::PlayMenu::FrameBuild()
 			AuroraCore::Graphics::GL::MaterialStruct _Material;
 			_Material.TextureAlbedo = 2;
 			_Material.Size = AuroraCore::Math::Vec2f(1.0f / 8.0f, 1.0f / 3.0f);
-			_Material.Start = AuroraCore::Math::Vec2f(0.0f / 8.0f, 0.0f / 3.0f);
+			_Material.Start = _SpritesLookup[_GrassSprite];
 
 			_Application.RenderSprite((float)(_Width) / (float)(_Height), _Camera, _WorldData, _Material, _DefaultShader);
 		}
@@ -532,7 +570,7 @@ void Stellaris::RunTime::PlayMenu::FrameBuild()
 
 		AuroraCore::Graphics::GL::MaterialStruct _Material;
 		_Material.TextureAlbedo = 2;
-		_Material.Start = AuroraCore::Math::Vec2f((float)(rand() % 6) / 8.0f, 1.0f / 3.0f);
+		_Material.Start = _StarSprites[rand() % _StarSprites.size()];
 		_Material.Size = AuroraCore::Math::Vec2f(1.0f / 8.0f, 1.0f / 3.0f);
 
 		_Application.RenderSprite((float)(_Width) / (float)(_Height), _Camera, _WorldData, _Material, _DefaultShader);
@@ -553,44 +591,22 @@ void Stellaris::RunTime::PlayMenu::FrameBuild()
 		{
 			if (Flying)
 			{
-				if (AnimationTime < 0.25f)
-				{
-					_Material.Start = AuroraCore::Math::Vec2f(2.0f / 8.0f, 2.0f / 3.0f);
-				}
-				else if (AnimationTime < 0.5f)
-				{
-					_Material.Start = AuroraCore::Math::Vec2f(3.0f / 8.0f, 2.0f / 3.0f);
-				}
-				else
-				{
-					_Material.Start = AuroraCore::Math::Vec2f(4.0f / 8.0f, 2.0f / 3.0f);
-				}
+				_Material.Start = _SpritesLookup[_PlayerWalkLeft1 + (size_t)(AnimationTime * 4.0f)];
 			}
 			else
 			{
-				_Material.Start = AuroraCore::Math::Vec2f(0.0f / 8.0f, 2.0f / 3.0f);
+				_Material.Start = _SpritesLookup[_PlayerIdleLeft];
 			}
 		}
 		else
 		{
 			if (Flying)
 			{
-				if (AnimationTime < 0.25f)
-				{
-					_Material.Start = AuroraCore::Math::Vec2f(5.0f / 8.0f, 2.0f / 3.0f);
-				}
-				else if (AnimationTime < 0.5f)
-				{
-					_Material.Start = AuroraCore::Math::Vec2f(6.0f / 8.0f, 2.0f / 3.0f);
-				}
-				else
-				{
-					_Material.Start = AuroraCore::Math::Vec2f(7.0f / 8.0f, 2.0f / 3.0f);
-				}
+				_Material.Start = _SpritesLookup[_PlayerWalkRight1 + (size_t)(AnimationTime * 4.0f)];
 			}
 			else
 			{
-				_Material.Start = AuroraCore::Math::Vec2f(1.0f / 8.0f, 2.0f / 3.0f);
+				_Material.Start = _SpritesLookup[_PlayerIdleRight];
 			}
 		}
 

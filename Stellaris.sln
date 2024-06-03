@@ -37,6 +37,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AuroraCore", "AuroraCore", 
 		Solution Items\Digital Certificates\AuroraCore\AuroraCore_SPC_PK.pvk = Solution Items\Digital Certificates\AuroraCore\AuroraCore_SPC_PK.pvk
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitTests", "UnitTests\UnitTests.vcxproj", "{3F9BAFE7-196A-463A-B55F-5F86DF093997}"
+	ProjectSection(ProjectDependencies) = postProject
+		{25791497-F6EE-49ED-8B16-A6C4445F8B81} = {25791497-F6EE-49ED-8B16-A6C4445F8B81}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -61,6 +66,14 @@ Global
 		{25791497-F6EE-49ED-8B16-A6C4445F8B81}.Release|x64.Build.0 = Release|x64
 		{25791497-F6EE-49ED-8B16-A6C4445F8B81}.Release|x86.ActiveCfg = Release|Win32
 		{25791497-F6EE-49ED-8B16-A6C4445F8B81}.Release|x86.Build.0 = Release|Win32
+		{3F9BAFE7-196A-463A-B55F-5F86DF093997}.Debug|x64.ActiveCfg = Debug|x64
+		{3F9BAFE7-196A-463A-B55F-5F86DF093997}.Debug|x64.Build.0 = Debug|x64
+		{3F9BAFE7-196A-463A-B55F-5F86DF093997}.Debug|x86.ActiveCfg = Debug|Win32
+		{3F9BAFE7-196A-463A-B55F-5F86DF093997}.Debug|x86.Build.0 = Debug|Win32
+		{3F9BAFE7-196A-463A-B55F-5F86DF093997}.Release|x64.ActiveCfg = Release|x64
+		{3F9BAFE7-196A-463A-B55F-5F86DF093997}.Release|x64.Build.0 = Release|x64
+		{3F9BAFE7-196A-463A-B55F-5F86DF093997}.Release|x86.ActiveCfg = Release|Win32
+		{3F9BAFE7-196A-463A-B55F-5F86DF093997}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

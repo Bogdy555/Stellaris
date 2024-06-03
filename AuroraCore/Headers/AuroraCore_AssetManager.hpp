@@ -17,6 +17,8 @@ namespace AuroraCore
 		const wchar_t* Name = nullptr;
 	};
 
+	// NU ARE OWNERSHIP ASUPRA RESURSELOR, E DOAR O METODA DE A ACCESA DATE
+	// Loading si clean up facute in user code, nu engine code!
 	class AssetManager
 	{
 
@@ -27,6 +29,7 @@ namespace AuroraCore
 		AssetManager(AssetManager&& _Other) noexcept;
 		~AssetManager();
 
+		// Sunt permise referinte catre aceasi data dar cu nume diferit
 		bool AddAsset(void* _Data, const wchar_t* _Name);
 
 		void RemoveAsset(const wchar_t* _Name);

@@ -34,6 +34,7 @@ void Stellaris::RunTime::PlayMenu::SetupScene()
 
 		if (_WorldMap.Load(L".\\Map.bmp"))
 		{
+			// Fara parity checks pentru a face mai usor modding ul
 			for (size_t _Y = 0; _Y < _WorldMap.GetHeight(); _Y++)
 			{
 				WorldMatrix.push_back(std::vector<bool>(_WorldMap.GetWidth()));
@@ -46,6 +47,7 @@ void Stellaris::RunTime::PlayMenu::SetupScene()
 		}
 		else
 		{
+			// In caz ca nu exista o mapa genereaza una default goala
 			WorldMatrix =
 			{
 				{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
@@ -62,6 +64,7 @@ void Stellaris::RunTime::PlayMenu::SetupScene()
 	}
 
 	World.Position = AuroraCore::Math::Vec2f(0.0f, 0.0f);
+	// Genereaza hitbox pentru lume
 	for (size_t _Y = 0; _Y < WorldMatrix.size(); _Y++)
 	{
 		for (size_t _X = 0; _X < WorldMatrix[_Y].size(); _X++)
@@ -129,6 +132,8 @@ void Stellaris::RunTime::PlayMenu::SpawnParticle()
 
 void Stellaris::RunTime::PlayMenu::UpdateParticles()
 {
+	// Sterge toate particulele care nu ar mai trebui sa fie "in viata"
+
 	for (size_t _Index = 0; _Index < ParticlesTime.size(); _Index++)
 	{
 		ParticlesTime[_Index] += GetTimeStep();
@@ -154,6 +159,9 @@ void Stellaris::RunTime::PlayMenu::PhysicsCallback(AuroraCore::Physics::Entity& 
 void Stellaris::RunTime::PlayMenu::GenerateStarPosition()
 {
 	size_t _NewPosX = rand() % WorldMatrix[0].size(), _NewPosY = rand() % WorldMatrix.size();
+
+	// Asigura ca steaua nu se poate spawna intr un bloc, indiferent de mapa
+	// Atata timp cat mapa nu are "insule" de aer atunci e garantat ca steaua e accesibila
 
 	while (WorldMatrix[_NewPosY][_NewPosX])
 	{
@@ -261,12 +269,16 @@ void Stellaris::RunTime::PlayMenu::Engine()
 
 	UpdateParticles();
 
+	// Miscare in jos
+
 	if ((Keys[AuroraCore::_Current]['S'] || ControllerStates[AuroraCore::_Current].YLeft < 0.0f) && (!Keys[AuroraCore::_Current][VK_SPACE] && !ControllerStates[AuroraCore::_Current].ButtonA))
 	{
 		float _Multiplyer = AuroraCore::Math::Max(abs(ControllerStates[AuroraCore::_Current].YLeft), 1.0f * Keys[AuroraCore::_Current]['S']);
 
 		Player.Force.y += -20.0f * _Multiplyer;
 	}
+
+	// Miscare in sus
 
 	Flying = false;
 
@@ -304,6 +316,8 @@ void Stellaris::RunTime::PlayMenu::Engine()
 		Flying = true;
 	}
 
+	// Miscare la stanga
+
 	if ((Keys[AuroraCore::_Current]['A'] || ControllerStates[AuroraCore::_Current].XLeft < 0.0f) && (!Keys[AuroraCore::_Current]['D'] && ControllerStates[AuroraCore::_Current].XLeft <= 0.0f))
 	{
 		float _Multiplyer = AuroraCore::Math::Max(abs(ControllerStates[AuroraCore::_Current].XLeft), 1.0f * Keys[AuroraCore::_Current]['A']);
@@ -311,6 +325,8 @@ void Stellaris::RunTime::PlayMenu::Engine()
 		Player.Force.x += AuroraCore::Physics::ComputeMaxAccelerationForce(-15.0f, 20.0f * _Multiplyer, Player.Velocity.x, Player.Mass, GetTimeStep());
 		LastLeft = true;
 	}
+
+	// Miscare la dreapta
 
 	if ((Keys[AuroraCore::_Current]['D'] || ControllerStates[AuroraCore::_Current].XLeft > 0.0f) && (!Keys[AuroraCore::_Current]['A'] && ControllerStates[AuroraCore::_Current].XLeft >= 0.0f))
 	{
@@ -320,10 +336,14 @@ void Stellaris::RunTime::PlayMenu::Engine()
 		LastLeft = false;
 	}
 
+	// Decelerare daca nu sunt apasate input uri sau daca sunt apasate intr un mod care nu are sens
+
 	if ((!(Keys[AuroraCore::_Current]['A'] || ControllerStates[AuroraCore::_Current].XLeft < 0.0f) && !(Keys[AuroraCore::_Current]['D'] || ControllerStates[AuroraCore::_Current].XLeft > 0.0f)) || ((Keys[AuroraCore::_Current]['A'] || ControllerStates[AuroraCore::_Current].XLeft < 0.0f) && (Keys[AuroraCore::_Current]['D'] || ControllerStates[AuroraCore::_Current].XLeft > 0.0f)))
 	{
 		Player.Force.x += AuroraCore::Physics::ComputeMaxDecelerationForce(10.0f, Player.Velocity.x, Player.Mass, GetTimeStep());
 	}
+
+	// Pregatirea si rularea scenei de physics
 
 	AuroraCore::Physics::Scene _PhysicsScene;
 

@@ -12,6 +12,8 @@ bool AuroraCore::Input::Controller::GetState(const uint32_t _Id, State& _State, 
 		return false;
 	}
 
+	// Pentru a usura matematica dam clamp la valori inferior. Se pierde totusi precizie de 1 / 65535 (pe care nimeni n o sa o observe...)
+
 	if (_XInputState.Gamepad.sThumbLX == -32768)
 	{
 		_XInputState.Gamepad.sThumbLX = -32767;
@@ -31,6 +33,8 @@ bool AuroraCore::Input::Controller::GetState(const uint32_t _Id, State& _State, 
 	{
 		_XInputState.Gamepad.sThumbRY = -32767;
 	}
+
+	// _XInputState.Gamepad.wButtons e un bitfield. Extrage din el direct butoanele apasate
 
 	_State.Start = (_XInputState.Gamepad.wButtons & XINPUT_GAMEPAD_START) != 0;
 	_State.Back = (_XInputState.Gamepad.wButtons & XINPUT_GAMEPAD_BACK) != 0;
@@ -59,6 +63,8 @@ bool AuroraCore::Input::Controller::GetState(const uint32_t _Id, State& _State, 
 	_State.ShoulderRight = (_XInputState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) != 0;
 	_State.TriggerRight = (float)(_XInputState.Gamepad.bRightTrigger) / 255.0f;
 
+	// Corectie pentru faulty hardware / small miss inputs
+
 	if (_DeadZone)
 	{
 		if (-XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE < _XInputState.Gamepad.sThumbLX && _XInputState.Gamepad.sThumbLX < XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
@@ -81,6 +87,8 @@ bool AuroraCore::Input::Controller::GetState(const uint32_t _Id, State& _State, 
 			_State.YRight = 0.0f;
 		}
 	}
+
+	// Corectie pentru faulty hardware / small miss inputs
 
 	if (_Threshold)
 	{

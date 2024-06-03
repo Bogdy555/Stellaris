@@ -22,11 +22,14 @@ int32_t AuroraCore::RunTime::Application::Run(const HINSTANCE _InstanceHandle, c
 	CmdLine = _CmdLine;
 	ShowCmd = _ShowCmd;
 
+	// Initializare generala
 	Setup();
 	while (On)
 	{
+		// 1 update = life time ul unui menui (sau cel putin asa e menit sa fie utilizat)
 		Update();
 	}
+	// Clean up dupa rularea aplicatiei
 	Stop();
 
 	CurrentMenu = _NullMenu;
@@ -110,6 +113,9 @@ const AuroraCore::Time::Timer& AuroraCore::RunTime::Application::GetFrameTime(co
 
 const float AuroraCore::RunTime::Application::GetTimeStep() const
 {
+	// In cazul in care e setat lag time si daca frame ul a durat mai mult sa se proceseze atunci dau cap la time step pentru a asigura disparitia jump urilor mari
+	// Important de luat in calcul si viteza simularii
+
 	if (LagTime != 0.0f && FrameTime[_Previous] >= LagTime)
 	{
 		return LagTime * SimulationSpeed;
@@ -178,6 +184,7 @@ void AuroraCore::RunTime::Menu::Run(Application* _ApplicationObj)
 		return;
 	}
 
+	// Mecanism ce permite unui meniu sa acceseze aplicatia parinte
 	ApplicationObj = _ApplicationObj;
 
 	Setup();
@@ -187,6 +194,7 @@ void AuroraCore::RunTime::Menu::Run(Application* _ApplicationObj)
 
 		Update();
 
+		// Sincronizarea thread ului principal cu timpul dorit (sau mai bine spus frame rate ul)
 		if (GetSync())
 		{
 			GetFrameTime(_Current).Stop();

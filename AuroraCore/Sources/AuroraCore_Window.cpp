@@ -17,6 +17,8 @@ AuroraCore::Window::~Window()
 	AURORA_CORE_ASSERT_MSG(Handle == NULL, AURORA_CORE_STRING_PREFIX("A window was not destroyed!"));
 }
 
+// Spawneaza thread ul unde va rula coada de mesaje a ferestrei grafice
+
 bool AuroraCore::Window::Create(const DWORD _ExStyle, const LPCWSTR _ClassName, const LPCWSTR _WindowName, const DWORD _Style, const int _X, const int _Y, const int _Width, const int _Height, const HWND _HandleParent, const HMENU _HandleMenu, const HINSTANCE _HandleInstance, LPVOID _Param, const HACCEL _HandleAccel, bool (*_ThreadInitFnc)(void* _UserData), void (*_ThreadCleanUpFnc)(void* _UserData), bool (*_WndInitFnc)(Window* _Wnd), void (*_WndCleanUpFnc)(Window* _Wnd), void* _UserData)
 {
 	if (Handle)
@@ -41,6 +43,8 @@ bool AuroraCore::Window::Create(const DWORD _ExStyle, const LPCWSTR _ClassName, 
 
 	WndThread = std::move(std::thread(WndThreadFnc, std::ref(_Done), std::ref(_Fail), this, _ExStyle, _ClassName, _WindowName, _Style, _X, _Y, _Width, _Height, _HandleParent, _HandleMenu, _HandleInstance, _Param, _HandleAccel, _ThreadInitFnc, _ThreadCleanUpFnc, _WndInitFnc, _WndCleanUpFnc, _UserData));
 
+	// Asteapta sa vezi daca thread ul a reusit sa creeze sau nu fereastra
+
 	while (!_Done)
 	{
 		std::this_thread::sleep_for(std::chrono::microseconds(1));
@@ -63,8 +67,10 @@ void AuroraCore::Window::Destroy()
 	}
 
 	PostMessage(Handle, WM_QUIT, 0, 0);
-	WndThread.join();
+	WndThread.join(); // IMPORTANT, NU UITA SA ASTEPTI DUPA THREAD UL FERESTREI
 }
+
+// Functie async pentru ca ruleaza pe alt thread
 
 bool AuroraCore::Window::Show(const int _ShowCmd) const
 {
@@ -111,6 +117,8 @@ const void* AuroraCore::Window::GetUserData() const
 	return UserData;
 }
 
+// Client size e pentru regiunea pe care se deseneaza
+
 const bool AuroraCore::Window::GetClientSize(size_t& _Width, size_t& _Height) const
 {
 	if (!Handle)
@@ -151,12 +159,16 @@ const bool AuroraCore::Window::GetWindowSize(size_t& _Width, size_t& _Height) co
 	return true;
 }
 
+// Se adapteaza in functie de monitorul pe care se aflta fereastra
+
 const uint64_t AuroraCore::Window::GetRefreshRate() const
 {
 	if (!Handle)
 	{
 		return 0;
 	}
+
+	// Obtine monitorul
 
 	HMONITOR _hMonitor = MonitorFromWindow(Handle, MONITOR_DEFAULTTOPRIMARY);
 
@@ -169,6 +181,8 @@ const uint64_t AuroraCore::Window::GetRefreshRate() const
 
 	_MonitorInfo.cbSize = sizeof(MONITORINFOEX);
 
+	// Obtine date despre monitor
+
 	if (!GetMonitorInfo(_hMonitor, &_MonitorInfo))
 	{
 		return 0;
@@ -177,6 +191,8 @@ const uint64_t AuroraCore::Window::GetRefreshRate() const
 	DEVMODE _DevMode = { 0 };
 
 	_DevMode.dmSize = sizeof(DEVMODE);
+
+	// Obtine alte date despre monitor
 
 	if (!EnumDisplaySettingsEx(_MonitorInfo.szDevice, ENUM_CURRENT_SETTINGS, &_DevMode, 0))
 	{
@@ -202,11 +218,14 @@ AuroraCore::Window* AuroraCore::Window::GetWindowPtr(const HWND _Handle)
 
 	if (!_WndPtr)
 	{
+		// Daca fereastra inca nu are setat user data la pointer ul corect inseamna ca suntem in mijlocul apelului CreateWindowEx si folosim membrul static al clasei Window
 		return LastWnd;
 	}
 
 	return _WndPtr;
 }
+
+// IMPORTANT: Modifica done si fail daca ai reusit/nu ai reusit sa creezi fereastra. Asigura te ca thread ul principal nu ramane blocat pentru ca ai uitat sa il notifici
 
 void AuroraCore::Window::WndThreadFnc(bool& _Done, bool& _Fail, Window* _Wnd, const DWORD _ExStyle, const LPCWSTR _ClassName, const LPCWSTR _WindowName, const DWORD _Style, const int _X, const int _Y, const int _Width, const int _Height, const HWND _HandleParent, const HMENU _HandleMenu, const HINSTANCE _HandleInstance, LPVOID _Param, const HACCEL _HandleAccel, bool (*_ThreadInitFnc)(void* _UserData), void (*_ThreadCleanUpFnc)(void* _UserData), bool (*_WndInitFnc)(Window* _Wnd), void (*_WndCleanUpFnc)(Window* _Wnd), void* _UserData)
 {
@@ -272,6 +291,8 @@ void AuroraCore::Window::WndThreadFnc(bool& _Done, bool& _Fail, Window* _Wnd, co
 
 	if (!SetWindowLongPtr(_Wnd->Handle, GWLP_USERDATA, (LONG_PTR)(_Wnd)))
 	{
+		// Cel mai ciudat error checking. Merci Microsoft...
+
 		if (GetLastError())
 		{
 			DestroyWindow(_Wnd->Handle);
@@ -329,6 +350,7 @@ void AuroraCore::Window::WndThreadFnc(bool& _Done, bool& _Fail, Window* _Wnd, co
 	{
 		if (_HandleAccel)
 		{
+			// Pentru shortcut uri
 			if (TranslateAccelerator(_Wnd->Handle, _HandleAccel, &_Msg))
 			{
 				continue;

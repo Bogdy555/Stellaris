@@ -21,10 +21,12 @@ namespace AuroraCore
 			uint8_t* Data = nullptr;
 			WAVEFORMATEX SoundInfo = { 0 };
 
+			// Helpers pentru menajare
 			static float GetTotalTime(const size_t _Size, const WAVEFORMATEX& _SoundInfo);
 			static size_t GetSecondIndex(const float _Second, const size_t _Size, const WAVEFORMATEX& _SoundInfo);
 			static float GetIndexSecond(const size_t _Index, const size_t _Size, const WAVEFORMATEX& _SoundInfo);
 
+			// Loaders and savers
 			static uint8_t* LoadSoundFile(const wchar_t* _Path, size_t& _Size, WAVEFORMATEX& _SoundInfo);
 			static uint8_t* LoadSoundResource(const HINSTANCE _InstanceHandle, const uint32_t _ResourceId, size_t& _Size, WAVEFORMATEX& _SoundInfo);
 			static bool SaveSoundFile(const wchar_t* _Path, const uint8_t* _Data, const size_t _Size, const WAVEFORMATEX& _SoundInfo);
@@ -35,11 +37,13 @@ namespace AuroraCore
 		{
 			LPGUID Id = nullptr;
 			std::wstring Name;
+			// Foloseste Driver pentru a identifica device changes
 			std::wstring Driver;
 		};
 
 		extern const std::vector<Device>& Devices;
 
+		// Foloseste pentru menajare de device uri
 		bool UpdateDevices();
 		void CleanDevices();
 		size_t GetDefaultDeviceIndex();
@@ -57,11 +61,13 @@ namespace AuroraCore
 			bool Create(const size_t _DeviceIndex);
 			void Destroy();
 
+			// ATENTIE: NON LINIAR
 			bool SetVolume(const float _Volume);
 			bool SetPosition(const Math::Vec3f& _Position, const bool _Deferred = true);
 			bool SetOrientation(const Math::Vec3f& _Front, const Math::Vec3f& _Up, const bool _Deferred = true);
 			bool SetVelocity(const Math::Vec3f& _Velocity, const bool _Deferred = true);
 
+			// ATENTIE: NON LINIAR
 			const bool GetVolume(float& _Volume) const;
 			const bool GetPosition(Math::Vec3f& _Position) const;
 			const bool GetOrientation(Math::Vec3f& _Front, Math::Vec3f& _Up) const;
@@ -87,6 +93,7 @@ namespace AuroraCore
 
 		};
 
+		// Mono si stereo
 		class Buffer
 		{
 
@@ -123,6 +130,7 @@ namespace AuroraCore
 
 		};
 
+		// Doar mono
 		class Buffer3D
 		{
 
@@ -159,6 +167,7 @@ namespace AuroraCore
 
 		};
 
+		// Mono si stereo
 		class Source
 		{
 
@@ -172,10 +181,12 @@ namespace AuroraCore
 			bool Create(Context& _Context, Buffer& _Buffer);
 			void Destroy();
 
+			// ATENTIE: NON LINIAR
 			bool SetVolume(const float _Volume);
 			bool SetFrequency(const float _Frequency);
 			bool SetCurrentPosition(const size_t _CurrentPosition);
 
+			// ATENTIE: NON LINIAR
 			const bool GetVolume(float& _Volume) const;
 			const bool GetFrequency(float& _Frequency) const;
 			const bool GetCurrentPosition(size_t& _CurrentPosition) const;
@@ -210,6 +221,7 @@ namespace AuroraCore
 
 		};
 
+		// Doar mono
 		class Source3D
 		{
 
@@ -223,6 +235,7 @@ namespace AuroraCore
 			bool Create(Context& _Context, Buffer3D& _Buffer);
 			void Destroy();
 
+			// ATENTIE: NON LINIAR
 			bool SetVolume(const float _Volume);
 			bool SetFrequency(const float _Frequency);
 			bool SetPosition(const Math::Vec3f& _Position, const bool _Deferred = true);
@@ -234,6 +247,7 @@ namespace AuroraCore
 			bool SetConeOutsideVolume(const float _Volume, const bool _Deferred = true);
 			bool SetCurrentPosition(const size_t _CurrentPosition);
 
+			// ATENTIE: NON LINIAR
 			const bool GetVolume(float& _Volume) const;
 			const bool GetFrequency(float& _Frequency) const;
 			const bool GetPosition(Math::Vec3f& _Position) const;

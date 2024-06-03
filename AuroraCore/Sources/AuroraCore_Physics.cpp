@@ -99,6 +99,8 @@ static const float Sign(const float _Value)
 	return (float)(_Value > 0.0f) - (float)(_Value < 0.0f);
 }
 
+// In ce directie trebuie sa mergi dupa ce detectezi o coliziune si cat pentru a o rezolva
+
 const float AuroraCore::Physics::ResolveCollision(const float _Start1, const float _Width1, const float _Start2, const float _Width2, const bool _Increas)
 {
 	if (_Increas)
@@ -113,6 +115,8 @@ const float AuroraCore::Physics::ResolveCollision(const float _Start1, const flo
 	return 0.0f;
 }
 
+// Rezolva inconsistente cauzate de delta time. Inainte player ul mergea la stanga, decelera, iar apoi accelera foarte putin la dreapta si tot oscila in jurul pozitiei curente
+
 const float AuroraCore::Physics::ComputeMaxDecelerationForce(const float _Force, const float _Velocity, const float _Mass, const float _DeltaTime)
 {
 	if (!_DeltaTime)
@@ -122,6 +126,8 @@ const float AuroraCore::Physics::ComputeMaxDecelerationForce(const float _Force,
 
 	return Sign(-_Velocity) * Math::Min(_Force, abs(_Velocity / _DeltaTime * _Mass));
 }
+
+// Rezolva inconsistente cauzate de delta time. Viteza acum da CAP la valoarea dorita indiferent de frame rate
 
 const float AuroraCore::Physics::ComputeMaxAccelerationForce(const float _MaxVelocity, const float _Force, const float _Velocity, const float _Mass, const float _DeltaTime)
 {
@@ -135,8 +141,27 @@ const float AuroraCore::Physics::ComputeMaxAccelerationForce(const float _MaxVel
 
 
 
+// Updateaza scenta
+// Posibilitati:
+// Y
+//   Layer resp
+//     Dynamic
+//     Static
+//   No resp
+//     Dynamic
+//     Static
+// X
+//   Layer resp
+//     Dynamic
+//     Static
+//   No resp
+//     Dynamic
+//     Static
+
 void AuroraCore::Physics::Scene::Update(const float _DeltaTime)
 {
+	// Pentru fiecare entitate dinamica din fiecare layer
+
 	for (size_t _LayerIndex1 = 0; _LayerIndex1 < Layers.size(); _LayerIndex1++)
 	{
 		for (size_t _EntityIndex1 = 0; _EntityIndex1 < Layers[_LayerIndex1].size(); _EntityIndex1++)
@@ -146,14 +171,20 @@ void AuroraCore::Physics::Scene::Update(const float _DeltaTime)
 				continue;
 			}
 
+			// Updateaza o
+
 			DynamicEntity& _Entity = *(DynamicEntity*)(Layers[_LayerIndex1][_EntityIndex1]);
 
 			_Entity.Force += _Entity.GravitationalAcceleration * _Entity.Mass;
 			_Entity.Force += Math::Vec2f(Physics::ComputeMaxDecelerationForce(abs(_Entity.Velocity.x * _Entity.Velocity.Magnitude() * _Entity.Drag.x), _Entity.Velocity.x, _Entity.Mass, _DeltaTime), Physics::ComputeMaxDecelerationForce(abs(_Entity.Velocity.y * _Entity.Velocity.Magnitude() * _Entity.Drag.y), _Entity.Velocity.y, _Entity.Mass, _DeltaTime));
 
+			// Updateaza o pe y
+
 			_Entity.Velocity.y += _Entity.Force.y / _Entity.Mass * _DeltaTime;
 			_Entity.Position.y += _Entity.Velocity.y * abs(_DeltaTime);
 			_Entity.Force.y = 0.0f;
+
+			// Verifica de coliziuni
 
 			for (size_t _LayerIndex2 = 0; _LayerIndex2 < Layers.size(); _LayerIndex2++)
 			{
@@ -182,6 +213,8 @@ void AuroraCore::Physics::Scene::Update(const float _DeltaTime)
 							for (size_t _BoxIndex2 = 0; _BoxIndex2 < _CollisionEntity.Box.Boxes.size(); _BoxIndex2++)
 							{
 								const AABB& _Box2 = _CollisionEntity.Box.Boxes[_BoxIndex2];
+
+								// Coliziune Y Layer resp Dynamic
 
 								if (AABB::CheckCollision(_Box1, _Box2, _Entity.Position, _CollisionEntity.Position))
 								{
@@ -220,6 +253,8 @@ void AuroraCore::Physics::Scene::Update(const float _DeltaTime)
 							for (size_t _BoxIndex2 = 0; _BoxIndex2 < _CollisionEntity.Box.Boxes.size(); _BoxIndex2++)
 							{
 								const AABB& _Box2 = _CollisionEntity.Box.Boxes[_BoxIndex2];
+
+								// Coliziune Y Layer resp Static
 
 								if (AABB::CheckCollision(_Box1, _Box2, _Entity.Position, _CollisionEntity.Position))
 								{
@@ -267,6 +302,8 @@ void AuroraCore::Physics::Scene::Update(const float _DeltaTime)
 							{
 								const AABB& _Box2 = _CollisionEntity.Box.Boxes[_BoxIndex2];
 
+								// Coliziune Y No resp Dynamic
+
 								if (AABB::CheckCollision(_Box1, _Box2, _Entity.Position, _CollisionEntity.Position))
 								{
 									if (_CollisionEntity.LayerResponse[_LayerIndex1])
@@ -302,6 +339,8 @@ void AuroraCore::Physics::Scene::Update(const float _DeltaTime)
 							{
 								const AABB& _Box2 = _CollisionEntity.Box.Boxes[_BoxIndex2];
 
+								// Coliziune Y No resp Static
+
 								if (AABB::CheckCollision(_Box1, _Box2, _Entity.Position, _CollisionEntity.Position))
 								{
 									_FoundCollision = true;
@@ -317,9 +356,13 @@ void AuroraCore::Physics::Scene::Update(const float _DeltaTime)
 				}
 			}
 
+			// Updateaza o pe x
+
 			_Entity.Velocity.x += _Entity.Force.x / _Entity.Mass * _DeltaTime;
 			_Entity.Position.x += _Entity.Velocity.x * abs(_DeltaTime);
 			_Entity.Force.x = 0.0f;
+
+			// Verifica de coliziuni
 
 			for (size_t _LayerIndex2 = 0; _LayerIndex2 < Layers.size(); _LayerIndex2++)
 			{
@@ -348,6 +391,8 @@ void AuroraCore::Physics::Scene::Update(const float _DeltaTime)
 							for (size_t _BoxIndex2 = 0; _BoxIndex2 < _CollisionEntity.Box.Boxes.size(); _BoxIndex2++)
 							{
 								const AABB& _Box2 = _CollisionEntity.Box.Boxes[_BoxIndex2];
+
+								// Coliziune X Layer resp Dynamic
 
 								if (AABB::CheckCollision(_Box1, _Box2, _Entity.Position, _CollisionEntity.Position))
 								{
@@ -386,6 +431,8 @@ void AuroraCore::Physics::Scene::Update(const float _DeltaTime)
 							for (size_t _BoxIndex2 = 0; _BoxIndex2 < _CollisionEntity.Box.Boxes.size(); _BoxIndex2++)
 							{
 								const AABB& _Box2 = _CollisionEntity.Box.Boxes[_BoxIndex2];
+
+								// Coliziune X Layer resp Static
 
 								if (AABB::CheckCollision(_Box1, _Box2, _Entity.Position, _CollisionEntity.Position))
 								{
@@ -433,6 +480,8 @@ void AuroraCore::Physics::Scene::Update(const float _DeltaTime)
 							{
 								const AABB& _Box2 = _CollisionEntity.Box.Boxes[_BoxIndex2];
 
+								// Coliziune X No resp Dynamic
+
 								if (AABB::CheckCollision(_Box1, _Box2, _Entity.Position, _CollisionEntity.Position))
 								{
 									if (_CollisionEntity.LayerResponse[_LayerIndex1])
@@ -467,6 +516,8 @@ void AuroraCore::Physics::Scene::Update(const float _DeltaTime)
 							for (size_t _BoxIndex2 = 0; _BoxIndex2 < _CollisionEntity.Box.Boxes.size(); _BoxIndex2++)
 							{
 								const AABB& _Box2 = _CollisionEntity.Box.Boxes[_BoxIndex2];
+
+								// Coliziune X No resp Static
 
 								if (AABB::CheckCollision(_Box1, _Box2, _Entity.Position, _CollisionEntity.Position))
 								{

@@ -47,6 +47,7 @@ namespace AuroraCore
 				float TriggerRight = 0.0f;
 			};
 
+			// Id ul poate fi setat la 0 si asta inseamna ANY CONTROLLER in loc de player 1 2 3 4 cum e pe controller asignat
 			bool GetState(const uint32_t _Id, State& _State, const bool _DeadZone = true, const bool _Threshold = true);
 			void CleanState(State& _State);
 			bool SetRumble(const uint32_t _Id, const float _Left, const float _Right);

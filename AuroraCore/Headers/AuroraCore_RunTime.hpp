@@ -59,6 +59,8 @@ namespace AuroraCore
 
 		protected:
 
+			// Trebuie suprascrise cu functionalitatea aplicatiei
+
 			virtual void Setup() = 0;
 			virtual void Update() = 0;
 			virtual void Stop() = 0;
@@ -98,6 +100,7 @@ namespace AuroraCore
 
 			void Run(Application* _ApplicationObj);
 
+			// Fa o lista de id uri si suprascrie asa incat sa returneze id ul TIPULUI de meniu, NU GUID de INSTANTA DE OBIECT
 			virtual const uint64_t GetType() const = 0;
 
 			void operator= (const Menu& _Other) = delete;
@@ -125,6 +128,8 @@ namespace AuroraCore
 			const float GetLagTime() const;
 			const float GetSimulationSpeed() const;
 			const uint64_t GetSync() const;
+
+			// Trebuie suprascrise cu functionalitatea meniului
 
 			virtual void Setup() = 0;
 			virtual void Update() = 0;

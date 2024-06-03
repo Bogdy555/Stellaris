@@ -7,6 +7,7 @@ static bool Initialized = false;
 
 
 
+// Spune time scheduler ului sa updateze aplicatia cat de repede poate
 bool AuroraCore::Time::Init()
 {
 	if (Initialized == true)
@@ -43,6 +44,8 @@ void AuroraCore::Time::Stop()
 }
 
 
+
+// Implementare standard care foloseste std::chrono::system_clock
 
 AuroraCore::Time::Timer::Timer() : Begin(std::chrono::system_clock::now()), End()
 {

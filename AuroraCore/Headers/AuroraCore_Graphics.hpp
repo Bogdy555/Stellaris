@@ -99,6 +99,7 @@ namespace AuroraCore
 				Image& operator= (Image&& _Other) noexcept;
 
 				bool Create(const size_t _Width, const size_t _Height, const size_t _ChannelsCount);
+				// Testat doar cu 24 bit bitmaps fara palete de culori. Pentru restul cazurilor undefined behaviour
 				bool Load(const wchar_t* _Path);
 				const bool Save(const wchar_t* _Path) const;
 				void Destroy();
@@ -123,8 +124,10 @@ namespace AuroraCore
 		namespace GL
 		{
 
+			// DLL OpenGL
 			extern HMODULE DllHandle;
 
+			// Functii din driver
 			extern void* (__stdcall* wglGetProcAddress)(const char*);
 			extern int(__stdcall* wglChoosePixelFormatARB)(HDC, const int*, const float*, unsigned int, int*, unsigned int*);
 			extern HGLRC(__stdcall* wglCreateContextAttribsARB)(HDC, HGLRC, const int*);
@@ -288,6 +291,7 @@ namespace AuroraCore
 
 			};
 
+			// E necesara pastrarea CPU cash ului in memorie pentru a putea randa mai tarziu (sau cel putin dimensiunea in elemente a IBO ului)
 			struct MeshCPUCash
 			{
 				VertexBufferCPUCash VBO;
@@ -401,6 +405,7 @@ namespace AuroraCore
 
 			};
 
+			// Format RGBA UINT8 cu repeat si nearest filtering
 			class Texture2D
 			{
 
@@ -434,10 +439,11 @@ namespace AuroraCore
 				Math::Vec2f Position = Math::Vec2f(0.0f, 0.0f);
 				float Angle = 0.0f;
 				float Fov = 10.0f;
-				float ZNear = -1.0f;
-				float ZFar = 1.0f;
+				float ZNear = -1.0f; // Pentru layered rendering
+				float ZFar = 1.0f; // Pentru layered rendering
 			};
 
+			// Cunoscut si sub numele de transform
 			struct MeshWorldDataStruct
 			{
 				Math::Vec3f Position = Math::Vec3f(0.0f, 0.0f, 0.0f);
@@ -449,9 +455,12 @@ namespace AuroraCore
 			{
 				int TextureAlbedo = 0;
 				Math::Vec4f Color = Math::Vec4f(1.0f, 1.0f, 1.0f, 1.0f);
+				// Mecanism de indexare in sprite sheet uri
 				Math::Vec2f Start = Math::Vec2f(0.0f, 0.0f);
 				Math::Vec2f Size = Math::Vec2f(1.0f, 1.0f);
 			};
+
+			// Helpere pentru a pasa uniforme catre GPU cu aceasi structura ca mai sus
 
 			const std::string GetUniformIndexName(const std::string _Name, const size_t _Index);
 			bool UniformSetCamera(const CameraStruct& _Camera, const Shader& _Shader, const char* _Name);
